@@ -210,7 +210,7 @@ table.t td.n,table.t th.n{text-align:right}
 <script type="module">
 import { firebaseConfig } from '../firebase-config.js';
 
-const VERSAO = '1.4';
+const VERSAO = '1.5';
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const configurado = !!(firebaseConfig && firebaseConfig.apiKey && !/COLE/i.test(firebaseConfig.apiKey));
 
@@ -434,7 +434,7 @@ function cardAg(a) {
   const p = profById(a.profId);
   if (a.tipo === 'bloqueio') return `<button class="ag bloq" data-act="verAg" data-id="${a.id}"><div class="ag-h"><b>${a.ini === '00:00' && a.fim === '23:59' ? 'Dia' : a.ini}</b><small>${a.ini === '00:00' && a.fim === '23:59' ? 'inteiro' : a.fim}</small></div><div class="ag-i"><b>Bloqueado</b><span>${esc(a.obs || 'Horário indisponível')} · ${esc(nomeProf(a))}</span></div>${ICON.ban}</button>`;
   const st = STATUS[a.status] || STATUS.pendente;
-  return `<button class="ag st-${a.status}" style="--pc:${p?.cor || 'var(--brand)'}" data-act="verAg" data-id="${a.id}"><div class="ag-h"><b>${a.ini}</b><small>${a.fim}</small></div><div class="ag-i"><b>${esc(a.clienteNome)}</b><span>${esc(a.servicoNome)} · ${esc(nomeProf(a))}</span></div><span class="pill ${st.c}">${st.t}</span></button>`;
+  return `<button class="ag st-${a.status}" style="--pc:${p?.cor || 'var(--brand)'}" data-act="verAg" data-id="${a.id}"><div class="ag-h"><b>${a.ini}</b><small>${a.fim}</small></div><div class="ag-i"><b>${esc(a.clienteNome)}</b><span>${a.pacoteNome ? '🎁 ' : ''}${esc(a.servicoNome)} · ${esc(nomeProf(a))}</span></div><span class="pill ${st.c}">${st.t}</span></button>`;
 }
 function sheetPendentes() {
   const l = S.ags.filter(a => a.status === 'pendente').sort(porDataHora);
@@ -442,7 +442,7 @@ function sheetPendentes() {
   openSheet(head('Pedidos online', 'Confirme ou recuse cada horário') + l.map(a => `
     <div class="card" style="margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;gap:10px"><div><b>${esc(a.clienteNome)}</b><div class="muted small">${telFmt(a.telefone)}</div></div><span class="pill warn">${fmtDia(a.data)} · ${a.ini}</span></div>
-      <div style="margin:8px 0 10px">${esc(a.servicoNome)} com ${esc(nomeProf(a))}${a.obs ? `<div class="muted small">“${esc(a.obs)}”</div>` : ''}</div>
+      <div style="margin:8px 0 10px">${esc(a.servicoNome)} com ${esc(nomeProf(a))}${a.pacoteNome ? `<div class="small" style="color:var(--brand);font-weight:600">🎁 Quer o pacote ${esc(a.pacoteNome)}</div>` : ''}${a.obs ? `<div class="muted small">“${esc(a.obs)}”</div>` : ''}</div>
       <div class="btns"><button class="btn pri sm" data-act="confirmar" data-id="${a.id}" data-volta="pend">${ICON.check}Confirmar</button><button class="btn sm danger" data-act="recusar" data-id="${a.id}">${ICON.x}Recusar</button></div>
     </div>`).join(''));
 }
@@ -477,6 +477,7 @@ function sheetAg(id) {
     ${a.obs ? `<div class="note">${esc(a.obs)}</div>` : ''}
     ${cli?.obs ? `<div class="note"><b>Preferências:</b> ${esc(cli.obs)}</div>` : ''}
     ${cps.length && a.status !== 'concluido' ? `<div class="note">${ICON.gift} Cliente tem pacote com sessão disponível para este serviço.</div>` : ''}
+    ${a.pacoteId && a.status !== 'concluido' && !S.cpacotes.some(cp => cp.pacoteId === a.pacoteId && a.clienteId && cp.clienteId === a.clienteId && cpAtivo(cp)) ? `<div class="note">🎁 Pediu o pacote <b>${esc(a.pacoteNome)}</b> pelo link${(p => p ? ` (${brl(p.preco)})` : '')(S.pacotes.find(x => x.id === a.pacoteId))}. Registre a venda para usar a 1ª sessão neste atendimento.<div style="margin-top:8px"><button class="btn sm pri" data-act="venderPacAg" data-id="${a.id}">${ICON.gift}Registrar venda do pacote</button></div></div>` : ''}
     <div class="btns">${acoes}</div>
     ${wa}
     <div class="btns" style="margin-top:8px">
@@ -750,12 +751,12 @@ async function salvarCli(form) {
   Object.assign(cliById(id), dados);
   toast('Cliente salva'); sheetCli(id);
 }
-function formVenderPac(cid) {
+function formVenderPac(cid, pacId = '', agId = '') {
   const c = cliById(cid), pacs = S.pacotes.filter(p => p.ativo !== false);
   if (!pacs.length) { toast('Cadastre um pacote primeiro'); S.tab = 'cadastros'; S.cadTab = 'pacotes'; closeSheet(); render(); return; }
   openSheet(head('Vender pacote', esc(c.nome)) + `
-  <form id="fVenda" data-cli="${cid}">
-    <div class="fld"><span>Pacote</span><div class="opts">${pacs.map((p, i) => `<label class="opt"><input type="radio" name="vdPac" value="${p.id}" ${i === 0 ? 'checked' : ''}><span style="flex:1"><b>${esc(p.nome)}</b><br><small class="muted">${resumoItens(p.itens)}</small></span><b>${brl(p.preco)}</b></label>`).join('')}</div></div>
+  <form id="fVenda" data-cli="${cid}" data-ag="${agId}">
+    <div class="fld"><span>Pacote</span><div class="opts">${pacs.map((p, i) => `<label class="opt"><input type="radio" name="vdPac" value="${p.id}" ${(pacId ? p.id === pacId : i === 0) ? 'checked' : ''}><span style="flex:1"><b>${esc(p.nome)}</b><br><small class="muted">${resumoItens(p.itens)}</small></span><b>${brl(p.preco)}</b></label>`).join('')}</div></div>
     <label class="fld"><span>Valor recebido (R$)</span><input id="vdValor" inputmode="decimal"></label>
     <div class="fld"><span>Forma de pagamento</span><div class="radios">${FORMAS.map((f, i) => `<label><input type="radio" name="vdForma" value="${f}" ${i === 0 ? 'checked' : ''}><span>${f}</span></label>`).join('')}</div></div>
     <button class="btn pri full">${ICON.gift}Registrar venda</button>
@@ -775,8 +776,11 @@ async function salvarVenda(form) {
     valor: num($('#vdValor').value) ?? (+p.preco || 0), formaPg: document.querySelector('[name=vdForma]:checked')?.value || 'Pix',
     data: hoje(), validade: addDias(hoje(), +p.validadeDias || 90), criadoEm: F.serverTimestamp(),
   };
-  await F.addDoc(col('clientePacotes'), dados);
-  toast('Pacote vendido'); setTimeout(() => sheetCli(cid), 150);
+  const ref = await F.addDoc(col('clientePacotes'), dados);
+  if (!S.cpacotes.some(x => x.id === ref.id)) S.cpacotes.push({ id: ref.id, ...dados });
+  toast('Pacote vendido');
+  const ag = form.dataset.ag;
+  setTimeout(() => ag ? sheetAg(ag) : sheetCli(cid), 150);
 }
 
 /* ---------- CAIXA ---------- */
@@ -1185,6 +1189,14 @@ const ACT = {
   editarCli: d => formCli(d.id),
   agendarCli: d => { const c = cliById(d.id); formAg(null, { clienteId: c.id, clienteNome: c.nome, telefone: c.telefone || '' }); },
   venderPac: d => formVenderPac(d.id),
+  venderPacAg: async d => {
+    const a = agById(d.id); if (!a) return;
+    let cid = a.clienteId;
+    if (!cid) { cid = await vincularCliente(a.clienteNome, a.telefone); if (cid) { await F.updateDoc(dref('agendamentos', a.id), { clienteId: cid }); a.clienteId = cid; } }
+    if (!cid) return toast('Não foi possível identificar a cliente');
+    if (!S.pacotes.some(p => p.id === a.pacoteId && p.ativo !== false)) toast('Esse pacote não está mais à venda; escolha outro');
+    formVenderPac(cid, a.pacoteId, a.id);
+  },
   excluirCp: async d => { if (!confirm('Excluir este pacote da cliente? As sessões restantes serão perdidas.')) return; await F.deleteDoc(dref('clientePacotes', d.id)); toast('Pacote excluído'); setTimeout(() => sheetCli(d.cli), 150); },
   excluirCli: async d => { if (!confirm('Excluir esta cliente? O histórico de atendimentos continua na agenda.')) return; await F.deleteDoc(dref('clientes', d.id)); closeSheet(); toast('Cliente excluída'); },
   per: d => { S.rel.per = d.p; if (d.p === 'custom' && !S.rel.de) { const [a, b] = [ymd(new Date(new Date().getFullYear(), new Date().getMonth(), 1)), hoje()]; S.rel.de = a; S.rel.ate = b; } render(); },

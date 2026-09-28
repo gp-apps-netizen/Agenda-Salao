@@ -9,8 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f8f4f2;--surface:#fff;--surface2:#f3ecee;--ink:#2a1f27;--muted:#7b6b75;--line:#e9dfe3;--brand:#7a2e63;--brand-soft:#f4e6ef;--on-brand:#fff;--ok:#2f855a;--shadow:0 1px 2px rgba(42,31,39,.06),0 6px 20px rgba(42,31,39,.06);--r:16px;color-scheme:light}
+:root{--hero:#7a2e63;--on-hero:#fff;--bg:#f8f4f2;--surface:#fff;--surface2:#f3ecee;--ink:#2a1f27;--muted:#7b6b75;--line:#e9dfe3;--brand:#7a2e63;--brand-soft:#f4e6ef;--on-brand:#fff;--ok:#2f855a;--shadow:0 1px 2px rgba(42,31,39,.06),0 6px 20px rgba(42,31,39,.06);--r:16px;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#141016;--surface:#1f1922;--surface2:#2a222e;--ink:#f4edf2;--muted:#a8989f;--line:#352c39;--brand:#d68cc0;--brand-soft:#3a2536;--on-brand:#1c1119;--ok:#5fc08a;--shadow:none;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#141016;--surface:#1f1922;--surface2:#2a222e;--ink:#f4edf2;--muted:#a8989f;--line:#352c39;--brand:#d68cc0;--brand-soft:#3a2536;--on-brand:#1c1119;--ok:#5fc08a;--shadow:none;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 button,input,textarea{font:inherit;color:inherit}
@@ -18,9 +19,13 @@ button{cursor:pointer}
 h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;margin:0;letter-spacing:-.01em}
 svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .muted{color:var(--muted)}.small{font-size:13px}
-.hero{background:var(--brand);color:var(--on-brand);padding:calc(28px + env(safe-area-inset-top)) 20px 44px;text-align:center;position:relative;overflow:hidden}
+.hero{background:var(--hero);color:var(--on-hero);padding:calc(28px + env(safe-area-inset-top)) 20px 44px;text-align:center;position:relative;overflow:hidden}
 .hero::after{content:"";position:absolute;inset:auto -20% -60px;height:90px;background:var(--bg);border-radius:50% 50% 0 0}
-.hero .logo{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.16);display:grid;place-items:center;margin:0 auto 12px}
+.hero .logo{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.16);display:grid;place-items:center;margin:0 auto 12px;overflow:hidden}
+.hero .logo.img{width:96px;height:96px;border-radius:24px;background:#fff;padding:6px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.hero .logo.img.semfundo{background:transparent;padding:0;box-shadow:none}
+.hero .logo img{width:100%;height:100%;object-fit:contain;display:block}
+.hero .slogan{margin:4px 0 0;font-size:15px;opacity:.95}
 .hero .logo svg{width:30px;height:30px}
 .hero h1{font-size:28px;line-height:1.15}
 .hero p{margin:6px 0 0;opacity:.85;font-size:14px}
@@ -89,8 +94,9 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 </head>
 <body>
 <header class="hero">
-  <div class="logo"><svg class="i" viewBox="0 0 24 24"><circle cx="6.5" cy="17" r="3"/><circle cx="17.5" cy="17" r="3"/><path d="M8.6 14.8 18 3M15.4 14.8 6 3"/></svg></div>
+  <div class="logo" id="hLogo"><svg class="i" viewBox="0 0 24 24"><circle cx="6.5" cy="17" r="3"/><circle cx="17.5" cy="17" r="3"/><path d="M8.6 14.8 18 3M15.4 14.8 6 3"/></svg></div>
   <h1 id="hNome">Agende seu horário</h1>
+  <p class="slogan" id="hSlogan" hidden></p>
   <p id="hEnd"></p>
   <div class="acts" id="hActs"></div>
 </header>
@@ -178,6 +184,9 @@ function renderTopo() {
   const c = S.cfg;
   document.title = `Agendar · ${c.nome}`;
   $('#hNome').textContent = c.nome;
+  aplicarTema(c); pwa(c, `Agendar · ${c.nome}`, c.nome, location.href.split('#')[0]);
+  const hl = $('#hLogo'); hl.className = 'logo ' + logoClasse(c); if (c.logo) hl.innerHTML = `<img src="${c.logo}" alt="${esc(c.nome)}">`; else if (hl.querySelector('img')) hl.innerHTML = LOGO_SVG;
+  $('#hSlogan').textContent = c.slogan || ''; $('#hSlogan').hidden = !c.slogan;
   $('#hEnd').textContent = c.endereco || '';
   const acts = [];
   if (c.whatsapp) acts.push(`<a href="${waLink(c.whatsapp, 'Olá! Vim pelo link de agendamento.')}" target="_blank" rel="noopener">${IC.wa}WhatsApp</a>`);
@@ -256,7 +265,7 @@ function render() {
 }
 function renderBar() {
   const s = servSel(), bar = $('#bar');
-  if (!s) { bar.hidden = true; return; }
+  if (!s || S.feito) { bar.hidden = true; return; }
   bar.hidden = false;
   const partes = [s.nome];
   if (S.sel.data) partes.push(parseYmd(S.sel.data).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('.', ''));
@@ -344,15 +353,16 @@ async function agendar() {
   // sem preferência: escolhe quem tem menos horários marcados no dia
   const p = livres.slice().sort((a, b) => S.ocup.filter(o => o.profId === a.id).length - S.ocup.filter(o => o.profId === b.id).length)[0];
   const fim = toHM(Math.min(toMin(S.sel.hora) + (+s.duracao || 30), 23 * 60 + 59));
+  const sel = { ...S.sel };
   S.enviando = true; renderBar();
   try {
     const ref = F.doc(col('agendamentos'));
     const b = F.writeBatch(db);
-    b.set(ref, { data: S.sel.data, ini: S.sel.hora, fim, profId: p.id, profNome: p.nome, servicoId: s.id, servicoNome: s.nome, valor: +s.preco || 0, clienteNome: nome, telefone: tel, obs, status: 'pendente', origem: 'online', tipo: 'normal', criadoEm: F.serverTimestamp() });
-    b.set(dref('ocupados', ref.id), { data: S.sel.data, profId: p.id, ini: S.sel.hora, fim });
+    b.set(ref, { data: sel.data, ini: sel.hora, fim, profId: p.id, profNome: p.nome, servicoId: s.id, servicoNome: s.nome, valor: +s.preco || 0, clienteNome: nome, telefone: tel, obs, status: 'pendente', origem: 'online', tipo: 'normal', criadoEm: F.serverTimestamp() });
+    b.set(dref("ocupados", ref.id), { data: sel.data, profId: p.id, ini: sel.hora, fim });
     await b.commit();
-    try { localStorage.setItem('meusDados', JSON.stringify({ nome, tel })); localStorage.setItem(LS('ultimoAgendamento'), JSON.stringify({ servico: s.nome, data: S.sel.data, hora: S.sel.hora })); } catch (e) {}
-    S.feito = { servico: s.nome, prof: p.nome, data: S.sel.data, hora: S.sel.hora, fim, valor: s.preco, nome };
+    try { localStorage.setItem('meusDados', JSON.stringify({ nome, tel })); localStorage.setItem(LS('ultimoAgendamento'), JSON.stringify({ servico: s.nome, data: sel.data, hora: sel.hora })); } catch (e) {}
+    S.feito = { servico: s.nome, prof: p.nome, data: sel.data, hora: sel.hora, fim, valor: s.preco, nome };
     $('#stDados').hidden = true; const pf = $('#stPacFim'); if (pf) pf.remove();
     render(); window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (e) {
@@ -366,12 +376,13 @@ function ouvirOcupados(data) {
   S.ocupDia = null;
   unsubOc = F.onSnapshot(F.query(col('ocupados'), F.where('data', '==', data)), snap => {
     S.ocup = snap.docs.map(d => ({ id: d.id, ...d.data() })); S.ocupDia = data;
-    if (S.sel.hora && !(mapaHoras()?.[S.sel.hora] || []).length) S.sel.hora = '';
+    if (!S.enviando && !S.feito && S.sel.hora && !(mapaHoras()?.[S.sel.hora] || []).length) S.sel.hora = '';
     render();
   }, e => { console.error(e); S.ocup = []; S.ocupDia = data; render(); });
 }
+const LOGO_SVG = '<svg class="i" viewBox="0 0 24 24"><circle cx="6.5" cy="17" r="3"/><circle cx="17.5" cy="17" r="3"/><path d="M8.6 14.8 18 3M15.4 14.8 6 3"/></svg>';
 async function init() {
-  pwa();
+  aplicarTema({});
   if (!configurado || !SID) { $('#fluxo').innerHTML = '<div class="aviso"><p class="muted" style="margin:0">Link de agendamento incompleto. Peça o link certo ao salão.</p></div>'; return; }
   try {
     const [A, Fs] = await Promise.all([import(FB + 'firebase-app.js'), import(FB + 'firebase-firestore.js')]);
@@ -384,13 +395,52 @@ async function init() {
     F.onSnapshot(col('pacotes'), s => { S.pacotes = mapa(s); render(); }, () => {});
   } catch (e) { console.error(e); $('#fluxo').innerHTML = '<div class="aviso"><p class="muted" style="margin:0">Sem conexão. Verifique a internet.</p></div>'; }
 }
-async function pwa() {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#7a2e63"/><g transform="translate(96 96) scale(13.33)" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"><circle cx="6.5" cy="17" r="3"/><circle cx="17.5" cy="17" r="3"/><path d="M8.6 14.8 18 3M15.4 14.8 6 3"/></g></svg>`;
+/* ---------- tema do salão (cor, logo, claro/escuro) ---------- */
+const PALETAS = [['Ameixa', '#7a2e63'], ['Rosé', '#c2577a'], ['Nude', '#b07a5e'], ['Terracota', '#b5523b'], ['Dourado', '#b08a3e'], ['Esmeralda', '#1f7a5c'], ['Petróleo', '#1f5f73'], ['Azul', '#2f5fb0'], ['Lilás', '#7b5cc4'], ['Grafite', '#3a3a40']];
+const hexRgb = h => { h = String(h || '#7a2e63').replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h, 16) || 0; return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+const rgbHex = a => '#' + a.map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
+const mixC = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+const lumC = c => { const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]); };
+const contr = (a, b) => { const x = lumC(a), y = lumC(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+function paleta(hex) {
+  const base = hexRgb(hex), W = [255, 255, 255], K = [0, 0, 0], BGL = [248, 244, 242], BGD = [31, 25, 34], ESC = [28, 17, 25];
+  let l = base; for (let i = 0; i < 12 && contr(l, BGL) < 3.2; i++) l = mixC(l, K, .12);
+  let d = base; for (let i = 0; i < 14 && contr(d, BGD) < 4.5; i++) d = mixC(d, W, .12);
+  const on = c => contr(c, W) >= contr(c, ESC) ? '#ffffff' : '#1c1119';
+  return { hero: rgbHex(base), heroOn: on(base), l: rgbHex(l), l2: rgbHex(mixC(l, W, .15)), lSoft: rgbHex(mixC(l, W, .88)), lOn: on(l), d: rgbHex(d), d2: rgbHex(mixC(d, W, .15)), dSoft: rgbHex(mixC(d, BGD, .78)), dOn: on(d) };
+}
+function aplicarTema(cfg = {}) {
+  const p = paleta(cfg.cor || '#7a2e63');
+  const H = `--hero:${p.hero};--on-hero:${p.heroOn}`;
+  const L = `--brand:${p.l};--brand2:${p.l2};--brand-soft:${p.lSoft};--on-brand:${p.lOn};${H}`;
+  const D = `--brand:${p.d};--brand2:${p.d2};--brand-soft:${p.dSoft};--on-brand:${p.dOn};${H}`;
+  let st = document.getElementById('temaSalao');
+  if (!st) { st = document.createElement('style'); st.id = 'temaSalao'; document.head.appendChild(st); }
+  st.textContent = `:root{${L}}@media (prefers-color-scheme:dark){:root:not([data-theme=light]){${D}}}:root[data-theme=dark]{${D}}`;
+  const de = document.documentElement;
+  if (cfg.tema === 'clara') de.dataset.theme = 'light'; else if (cfg.tema === 'escura') de.dataset.theme = 'dark'; else delete de.dataset.theme;
+  const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = p.hero;
+}
+const logoHtml = (cfg, fallback) => cfg.logo ? `<img src="${cfg.logo}" alt="">` : fallback;
+const logoClasse = cfg => cfg.logo ? (cfg.logoFundo === false ? 'img semfundo' : 'img') : '';
+let pwaChave = '';
+async function pwa(cfg = {}, nome = 'Salão', curto = 'Salão', startUrl = null) {
+  const chave = [cfg.cor, cfg.logo ? cfg.logo.length : 0, cfg.logoFundo, nome].join('|'); if (chave === pwaChave) return; pwaChave = chave;
   try {
-    const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); await img.decode();
-    const icons = [192, 512].map(s => { const c = document.createElement('canvas'); c.width = c.height = s; c.getContext('2d').drawImage(img, 0, 0, s, s); return { src: c.toDataURL('image/png'), sizes: `${s}x${s}`, type: 'image/png', purpose: 'any' }; });
-    const base = new URL('./', location.href).href;
-    const man = { name: 'Agendar horário', short_name: 'Agendar', id: location.href.split('#')[0], start_url: location.href.split('#')[0], scope: base, display: 'standalone', background_color: '#f8f4f2', theme_color: '#7a2e63', icons };
+    const p = paleta(cfg.cor || '#7a2e63');
+    const carregar = async src => { const i = new Image(); i.src = src; await i.decode(); return i; };
+    let logo = null; if (cfg.logo) try { logo = await carregar(cfg.logo); } catch (e) { logo = null; }
+    const tes = logo ? null : await carregar('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="${p.heroOn}" stroke-width="1.7" stroke-linecap="round"><circle cx="6.5" cy="17" r="3"/><circle cx="17.5" cy="17" r="3"/><path d="M8.6 14.8 18 3M15.4 14.8 6 3"/></g></svg>`));
+    const icons = [192, 512].map(s => {
+      const c = document.createElement('canvas'); c.width = c.height = s; const x = c.getContext('2d');
+      x.fillStyle = logo && cfg.logoFundo !== false ? '#ffffff' : p.hero; x.fillRect(0, 0, s, s);
+      if (logo) { const box = s * .76, r = Math.min(box / logo.width, box / logo.height), w = logo.width * r, h = logo.height * r; x.drawImage(logo, (s - w) / 2, (s - h) / 2, w, h); }
+      else x.drawImage(tes, s * .22, s * .22, s * .56, s * .56);
+      return { src: c.toDataURL('image/png'), sizes: `${s}x${s}`, type: 'image/png', purpose: 'any' };
+    });
+    const base = new URL('./', location.href).href, start = startUrl || base;
+    const man = { name: nome, short_name: curto.slice(0, 12), id: start, start_url: start, scope: base, display: 'standalone', background_color: '#f8f4f2', theme_color: p.hero, icons };
+    document.querySelectorAll('link[rel=manifest],link[rel=icon],link[rel=apple-touch-icon]').forEach(l => l.remove());
     const add = (rel, href) => { const l = document.createElement('link'); l.rel = rel; l.href = href; document.head.appendChild(l); };
     add('manifest', URL.createObjectURL(new Blob([JSON.stringify(man)], { type: 'application/manifest+json' })));
     add('icon', icons[0].src); add('apple-touch-icon', icons[0].src);

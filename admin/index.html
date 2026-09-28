@@ -9,8 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f8f4f2;--surface:#fff;--surface2:#f3ecee;--ink:#2a1f27;--muted:#7b6b75;--line:#e9dfe3;--brand:#7a2e63;--brand2:#9c3f80;--brand-soft:#f4e6ef;--on-brand:#fff;--ok:#2f855a;--warn:#b7791f;--info:#2f6fb0;--bad:#c0392b;--off:#8a8a8a;--shadow:0 1px 2px rgba(42,31,39,.06),0 6px 20px rgba(42,31,39,.06);--r:14px;color-scheme:light}
+:root{--hero:#7a2e63;--on-hero:#fff;--bg:#f8f4f2;--surface:#fff;--surface2:#f3ecee;--ink:#2a1f27;--muted:#7b6b75;--line:#e9dfe3;--brand:#7a2e63;--brand2:#9c3f80;--brand-soft:#f4e6ef;--on-brand:#fff;--ok:#2f855a;--warn:#b7791f;--info:#2f6fb0;--bad:#c0392b;--off:#8a8a8a;--shadow:0 1px 2px rgba(42,31,39,.06),0 6px 20px rgba(42,31,39,.06);--r:14px;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#141016;--surface:#1f1922;--surface2:#2a222e;--ink:#f4edf2;--muted:#a8989f;--line:#352c39;--brand:#d68cc0;--brand2:#e3a6d0;--brand-soft:#3a2536;--on-brand:#1c1119;--ok:#5fc08a;--warn:#e0b050;--info:#6aa7e6;--bad:#ef7a6c;--off:#8d8590;--shadow:none;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#141016;--surface:#1f1922;--surface2:#2a222e;--ink:#f4edf2;--muted:#a8989f;--line:#352c39;--brand:#d68cc0;--brand2:#e3a6d0;--brand-soft:#3a2536;--on-brand:#1c1119;--ok:#5fc08a;--warn:#e0b050;--info:#6aa7e6;--bad:#ef7a6c;--off:#8d8590;--shadow:none;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -22,7 +23,18 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 .brand b{display:block;font-family:Fraunces,serif;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brand small{display:block;color:var(--muted);font-size:12px}
-.logo{width:36px;height:36px;border-radius:10px;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;flex:none}
+.logo{width:36px;height:36px;border-radius:10px;background:var(--hero);color:var(--on-hero);display:grid;place-items:center;flex:none;overflow:hidden}
+.logo.img{background:#fff;padding:2px}.logo.img.semfundo{background:transparent;padding:0}.logo img{width:100%;height:100%;object-fit:contain;display:block}
+.logo-edit{display:flex;align-items:center;gap:14px}
+.logo-prev{width:84px;height:84px;border-radius:18px;background:var(--hero);color:var(--on-hero);display:grid;place-items:center;flex:none;overflow:hidden;border:1px solid var(--line)}
+.logo-prev.img{background:#fff;padding:6px}.logo-prev.img.semfundo{background:repeating-conic-gradient(var(--surface2) 0 25%,var(--surface) 0 50%) 0 0/14px 14px;padding:0}.logo-prev img{width:100%;height:100%;object-fit:contain}.logo-prev svg{width:40px;height:40px}
+.cores .custom{position:relative;width:30px;height:30px;border-radius:50%;border:2px dashed var(--muted);display:grid;place-items:center;overflow:hidden;font-weight:700;color:var(--muted)}
+.cores .custom input{position:absolute;inset:-6px;width:44px;height:44px;opacity:0;cursor:pointer}
+.cores .custom.on{border:3px solid var(--ink)}
+.prev-hero{border-radius:14px;background:var(--hero);color:var(--on-hero);padding:14px;display:flex;align-items:center;gap:12px;margin-top:4px}
+.prev-hero .logo{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.18)}
+.prev-hero .logo.img{background:#fff}.prev-hero .logo.img.semfundo{background:transparent}
+.prev-hero b{font-family:Fraunces,serif;font-size:17px;display:block}.prev-hero small{opacity:.85}
 .logo svg{width:22px;height:22px}
 .view{max-width:760px;margin:0 auto;padding:14px 16px calc(96px + env(safe-area-inset-bottom))}
 .bottom{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:space-around;background:var(--surface);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
@@ -196,7 +208,7 @@ table.t td.n,table.t th.n{text-align:right}
 <script type="module">
 import { firebaseConfig } from '../firebase-config.js';
 
-const VERSAO = '1.1';
+const VERSAO = '1.3';
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const configurado = !!(firebaseConfig && firebaseConfig.apiKey && !/COLE/i.test(firebaseConfig.apiKey));
 
@@ -342,6 +354,7 @@ window.addEventListener('popstate', () => { if (!$('#sheet').hidden) hideSheet()
 const head = (t, sub) => `<div class="sh-head"><div><h2>${t}</h2>${sub ? `<div class="sub">${sub}</div>` : ''}</div><button class="x" data-act="fecharSheet" aria-label="Fechar">${ICON.x}</button></div>`;
 
 function render() {
+  if (S.user && S.acesso === 'ok' && S.tab === 'ajustes' && S.cfgSujo && document.getElementById('fCfg')) return;
   const ae = document.activeElement;
   const fid = ae && ae.id && app.contains(ae) ? ae.id : null;
   const pos = fid && 'selectionStart' in ae ? ae.selectionStart : null;
@@ -353,6 +366,7 @@ function render() {
   else if (S.acesso === 'suspenso') app.innerHTML = vAviso('Acesso suspenso', 'O acesso deste salão está suspenso no momento. Seus dados continuam guardados. Fale com o administrador do sistema para reativar.');
   else if (S.acesso !== 'ok') app.innerHTML = '<div class="spin"></div>';
   else app.innerHTML = vShell();
+  if (S.tab === 'ajustes' && document.getElementById('cfPrev')) previewTema();
   if (fid) { const el = document.getElementById(fid); if (el) { el.focus(); try { if (pos != null) el.setSelectionRange(pos, pos); } catch (e) {} } }
 }
 
@@ -377,7 +391,7 @@ function vShell() {
   const tabs = [['agenda', 'Agenda', 'cal', pend], ['clientes', 'Clientes', 'users'], ['caixa', 'Caixa', 'chart'], ['cadastros', 'Cadastros', 'tag'], ['ajustes', 'Ajustes', 'gear']];
   const tit = { agenda: 'Agenda', clientes: 'Clientes', caixa: 'Caixa e relatórios', cadastros: 'Serviços, pacotes e equipe', ajustes: 'Ajustes' }[S.tab];
   const views = { agenda: vAgenda, clientes: vClientes, caixa: vCaixa, cadastros: vCadastros, ajustes: vAjustes };
-  return `<header class="top"><div class="brand"><span class="logo">${ICON.logo}</span><div><b>${esc(S.cfg.nome)}</b><small>${tit}${S.suporte ? ' · suporte' : ''}</small></div></div>
+  return `<header class="top"><div class="brand"><span class="logo ${logoClasse(S.cfg)}">${logoHtml(S.cfg, ICON.logo)}</span><div><b>${esc(S.cfg.nome)}</b><small>${tit}${S.suporte ? ' · suporte' : ''}</small></div></div>
     ${S.tab === 'agenda' && S.dia !== hoje() ? `<button class="icon-btn" data-act="irHoje">Hoje</button>` : ''}</header>
   <main class="view">${views[S.tab]()}</main>
   <nav class="bottom">${tabs.map(([k, t, ic, b]) => `<button class="${S.tab === k ? 'on' : ''}" data-act="tab" data-t="${k}">${ICON[ic]}${t}${b ? `<span class="badge">${b}</span>` : ''}</button>`).join('')}</nav>`;
@@ -996,6 +1010,7 @@ function vAjustes() {
     <button class="btn full2" data-act="qr">QR Code para imprimir</button></div>
   </div>
   <form id="fCfg">
+  ${vAparencia()}
   <div class="sec-t"><h3>Dados do salão</h3></div>
   <div class="card">
     <label class="fld"><span>Nome do salão</span><input id="cfNome" value="${esc(c.nome)}" required></label>
@@ -1026,8 +1041,10 @@ function vAjustes() {
   <p class="muted small center" style="margin-top:18px">Agenda de Salão · v${VERSAO}</p>`;
 }
 async function salvarCfg() {
-  const d = { nome: $('#cfNome').value.trim() || 'Meu Salão', whatsapp: $('#cfWa').value.trim(), endereco: $('#cfEnd').value.trim(), instagram: $('#cfIg').value.trim(), online: $('#cfOn').checked, intervalo: +$('#cfInt').value, antecedencia: +$('#cfAnt').value, diasFrente: Math.max(1, +$('#cfDias').value || 30), msgConfirmacao: $('#cfMC').value, msgLembrete: $('#cfML').value, msgAniversario: $('#cfMA').value };
+  const ap = lerAparencia();
+  const d = { cor: ap.cor, tema: ap.tema, logoFundo: ap.logoFundo, slogan: ap.slogan, ...('logo' in rascunho ? { logo: rascunho.logo } : {}), nome: $('#cfNome').value.trim() || 'Meu Salão', whatsapp: $('#cfWa').value.trim(), endereco: $('#cfEnd').value.trim(), instagram: $('#cfIg').value.trim(), online: $('#cfOn').checked, intervalo: +$('#cfInt').value, antecedencia: +$('#cfAnt').value, diasFrente: Math.max(1, +$('#cfDias').value || 30), msgConfirmacao: $('#cfMC').value, msgLembrete: $('#cfML').value, msgAniversario: $('#cfMA').value };
   await F.setDoc(dref('config', 'salao'), d, { merge: true });
+  S.cfgSujo = false; rascunho = {}; Object.assign(S.cfg, d); aplicarTema(S.cfg); render();
   toast('Ajustes salvos');
 }
 async function mostrarQR() {
@@ -1036,6 +1053,57 @@ async function mostrarQR() {
     if (!window.QRCode) await new Promise((ok, err) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js'; s.onload = ok; s.onerror = err; document.head.appendChild(s); });
     $('#qrBox').innerHTML = ''; new QRCode($('#qrBox'), { text: linkCliente(), width: 240, height: 240, colorDark: '#2a1f27', colorLight: '#ffffff' });
   } catch (e) { $('#qrBox').innerHTML = '<p class="muted small">Não foi possível gerar o QR Code sem internet.</p>'; }
+}
+
+let rascunho = {};
+function vAparencia() {
+  const c = { ...S.cfg, ...rascunho }, cor = (c.cor || '#7a2e63').toLowerCase();
+  const pre = PALETAS.some(([, h]) => h === cor);
+  return `<div class="sec-t" style="margin-top:4px"><h3>Aparência</h3></div>
+  <div class="card">
+    <div class="fld"><span>Logomarca</span>
+      <div class="logo-edit"><div class="logo-prev ${logoClasse(c)}" id="lgPrev">${logoHtml(c, ICON.logo)}</div>
+        <div style="flex:1"><label class="btn sm soft" style="width:100%">Escolher imagem<input type="file" id="cfLogo" accept="image/*" hidden></label>
+        <button type="button" class="btn sm ghost danger" style="width:100%;margin-top:6px;${c.logo ? '' : 'display:none'}" data-act="tirarLogo">${ICON.trash}Remover</button></div></div>
+      <label class="check"><input type="checkbox" id="cfLogoFundo" ${c.logoFundo === false ? '' : 'checked'}> Fundo branco atrás do logo</label>
+    </div>
+    <div class="fld"><span>Cor principal</span>
+      <div class="cores">${PALETAS.map(([n, h]) => `<label title="${n}"><input type="radio" name="cfCor" value="${h}" ${h === cor ? 'checked' : ''}><span style="background:${h}"></span></label>`).join('')}
+        <label class="custom ${pre ? '' : 'on'}" title="Outra cor" style="${pre ? '' : `background:${esc(cor)};border-style:solid`}">+<input type="color" id="cfCorCustom" value="${esc(cor)}"></label></div>
+    </div>
+    <div class="fld"><span>Tema</span><div class="radios">${[['', 'Automático'], ['clara', 'Claro'], ['escura', 'Escuro']].map(([v, t]) => `<label><input type="radio" name="cfTema" value="${v}" ${(c.tema || '') === v ? 'checked' : ''}><span>${t}</span></label>`).join('')}</div>
+      <p class="muted small" style="margin:6px 2px 0">Automático segue o modo claro/escuro do celular de cada pessoa.</p></div>
+    <label class="fld"><span>Frase de apresentação (aparece no link)</span><input id="cfSlogan" maxlength="80" value="${esc(c.slogan || '')}" placeholder="Ex.: Beleza e cuidado desde 2010"></label>
+    <div class="fld" style="margin:0"><span>Prévia</span><div class="prev-hero" id="cfPrev"></div></div>
+  </div>`;
+}
+function lerAparencia() {
+  const custom = $('#cfCorCustom');
+  return {
+    cor: document.querySelector('[name=cfCor]:checked')?.value || custom?.value || S.cfg.cor || '#7a2e63',
+    tema: document.querySelector('[name=cfTema]:checked')?.value || '',
+    logoFundo: $('#cfLogoFundo') ? $('#cfLogoFundo').checked : S.cfg.logoFundo !== false,
+    slogan: $('#cfSlogan')?.value.trim() || '',
+  };
+}
+function previewTema() {
+  if (!$('#fCfg')) return;
+  const ap = lerAparencia(), c = { ...S.cfg, ...ap, ...('logo' in rascunho ? { logo: rascunho.logo } : {}), nome: $('#cfNome')?.value.trim() || S.cfg.nome };
+  aplicarTema(c);
+  const pv = $('#lgPrev'); if (pv) { pv.className = 'logo-prev ' + logoClasse(c); pv.innerHTML = logoHtml(c, ICON.logo); }
+  const cu = document.querySelector('.cores .custom'); if (cu) { const pre = PALETAS.some(([, h]) => h === ap.cor.toLowerCase()); cu.classList.toggle('on', !pre); cu.style.background = pre ? '' : ap.cor; cu.style.borderStyle = pre ? '' : 'solid'; }
+  const pr = $('#cfPrev'); if (pr) pr.innerHTML = `<span class="logo ${logoClasse(c)}">${logoHtml(c, ICON.logo)}</span><div><b>${esc(c.nome)}</b><small>${esc(c.slogan || 'Agende seu horário')}</small></div><span style="margin-left:auto" class="btn sm" >Agendar</span>`;
+  const rm = document.querySelector('[data-act=tirarLogo]'); if (rm) rm.style.display = c.logo ? '' : 'none';
+}
+async function prepararLogo(file) {
+  const url = URL.createObjectURL(file), img = new Image(); img.src = url; await img.decode();
+  const max = 360, r = Math.min(1, max / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height));
+  const w = Math.max(1, Math.round((img.naturalWidth || img.width) * r)), h = Math.max(1, Math.round((img.naturalHeight || img.height) * r));
+  const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h); URL.revokeObjectURL(url);
+  let q = .9, out = c.toDataURL('image/webp', q);
+  if (!out.startsWith('data:image/webp')) out = c.toDataURL('image/png');
+  while (out.length > 250000 && q > .35) { q -= .15; out = c.toDataURL('image/webp', q); }
+  return out;
 }
 
 /* ---------- exemplo ---------- */
@@ -1066,7 +1134,8 @@ async function carregarExemplo() {
 /* ---------- ações ---------- */
 const ACT = {
   fecharSheet: () => closeSheet(),
-  tab: d => { S.tab = d.t; window.scrollTo(0, 0); render(); },
+  tab: d => { if (S.tab === 'ajustes' && d.t !== 'ajustes') { if (S.cfgSujo && !confirm('Sair sem salvar os ajustes?')) return; S.cfgSujo = false; rascunho = {}; aplicarTema(S.cfg); } S.tab = d.t; window.scrollTo(0, 0); render(); },
+  tirarLogo: () => { rascunho.logo = ''; S.cfgSujo = true; previewTema(); },
   irHoje: () => { S.dia = hoje(); render(); },
   dia: d => { setDia(d.d); },
   diaMenos: () => setDia(addDias(S.dia, -1)),
@@ -1149,9 +1218,13 @@ document.addEventListener('submit', e => {
   Promise.resolve(f(e.target)).catch(err => { console.error(err); toast('Não foi possível salvar: ' + (err.code || err.message || '')); e.target.querySelectorAll('button').forEach(b => b.disabled = false); });
 });
 document.addEventListener('input', e => {
+  if (e.target.id === 'cfCorCustom') { document.querySelectorAll('[name=cfCor]').forEach(r => r.checked = false); e.target.closest('.custom').classList.add('on'); S.cfgSujo = true; previewTema(); return; }
+  if (e.target.closest && e.target.closest('#fCfg')) { S.cfgSujo = true; if (e.target.id === 'cfSlogan' || e.target.id === 'cfNome') previewTema(); }
   if (e.target.dataset.in === 'cliBusca') { S.cliBusca = e.target.value; render(); }
 });
 document.addEventListener('change', e => {
+  if (e.target.id === 'cfLogo' && e.target.files[0]) { prepararLogo(e.target.files[0]).then(u => { rascunho.logo = u; S.cfgSujo = true; previewTema(); }).catch(() => toast('Não foi possível abrir essa imagem')); return; }
+  if (e.target.closest && e.target.closest('#fCfg')) { S.cfgSujo = true; if (['cfCor', 'cfTema'].includes(e.target.name) || e.target.id === 'cfLogoFundo') previewTema(); }
   if (e.target.id === 'diaPick' && e.target.value) setDia(e.target.value);
   if (e.target.id === 'relDe' || e.target.id === 'relAte') { S.rel.de = $('#relDe').value; S.rel.ate = $('#relAte').value; if (S.rel.de && S.rel.ate) render(); }
 });
@@ -1167,7 +1240,7 @@ async function entrar() {
 function pararOuvir() { unsubs.forEach(u => u()); unsubs = []; if (unsubAgs) unsubAgs(); unsubAgs = null; }
 function ouvir() {
   pararOuvir();
-  unsubs.push(F.onSnapshot(dref('config', 'salao'), s => { S.cfg = { ...CFG_PADRAO, nome: S.salao?.nome || CFG_PADRAO.nome, ...(s.exists() ? s.data() : {}) }; document.title = S.cfg.nome + ' • Gestão'; render(); }, e => console.error(e)));
+  unsubs.push(F.onSnapshot(dref('config', 'salao'), s => { S.cfg = { ...CFG_PADRAO, nome: S.salao?.nome || CFG_PADRAO.nome, ...(s.exists() ? s.data() : {}) }; document.title = S.cfg.nome + ' • Gestão'; aplicarTema(S.cfg); pwa(S.cfg, S.cfg.nome + ' • Gestão', S.cfg.nome); render(); }, e => console.error(e)));
   const mapa = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
   const L = (ref, fn) => unsubs.push(F.onSnapshot(ref, s => { fn(s); render(); }, e => { console.error(e); if (e.code === 'permission-denied') toast('Sem permissão: confira as regras do Firestore'); }));
   L(col('servicos'), s => S.servicos = mapa(s).sort((a, b) => (a.categoria || '').localeCompare(b.categoria || '') || porNome(a, b)));
@@ -1189,7 +1262,7 @@ function ouvirAgs() {
 async function entrouSaiu(u) {
   pararOuvir(); if (unsubSalao) unsubSalao(); unsubSalao = null;
   Object.assign(S, { user: u, acesso: null, suporte: false, salao: null, ags: [], servicos: [], profs: [], pacotes: [], clientes: [], cpacotes: [], comissoes: {}, relDados: null, cfg: { ...CFG_PADRAO } });
-  SID = null;
+  SID = null; aplicarTema({}); rascunho = {}; S.cfgSujo = false;
   if (!u) { S.pronto = true; render(); return; }
   S.pronto = true; render();
   const email = (u.email || '').toLowerCase(), param = new URLSearchParams(location.search).get('salao');
@@ -1209,7 +1282,7 @@ async function entrouSaiu(u) {
   }, e => { console.error(e); S.acesso = 'semSalao'; render(); });
 }
 async function init() {
-  pwa();
+  aplicarTema({}); pwa({}, 'Agenda do Salão', 'Salão');
   if (!configurado) { render(); return; }
   try {
     const [A, Au, Fs] = await Promise.all([import(FB + 'firebase-app.js'), import(FB + 'firebase-auth.js'), import(FB + 'firebase-firestore.js')]);
@@ -1223,13 +1296,52 @@ async function init() {
 }
 
 /* ---------- PWA ---------- */
-async function pwa() {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#7a2e63"/><g transform="translate(96 96) scale(13.33)" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"><circle cx="6.5" cy="17" r="3"/><circle cx="17.5" cy="17" r="3"/><path d="M8.6 14.8 18 3M15.4 14.8 6 3"/></g></svg>`;
+/* ---------- tema do salão (cor, logo, claro/escuro) ---------- */
+const PALETAS = [['Ameixa', '#7a2e63'], ['Rosé', '#c2577a'], ['Nude', '#b07a5e'], ['Terracota', '#b5523b'], ['Dourado', '#b08a3e'], ['Esmeralda', '#1f7a5c'], ['Petróleo', '#1f5f73'], ['Azul', '#2f5fb0'], ['Lilás', '#7b5cc4'], ['Grafite', '#3a3a40']];
+const hexRgb = h => { h = String(h || '#7a2e63').replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h, 16) || 0; return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+const rgbHex = a => '#' + a.map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
+const mixC = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+const lumC = c => { const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]); };
+const contr = (a, b) => { const x = lumC(a), y = lumC(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+function paleta(hex) {
+  const base = hexRgb(hex), W = [255, 255, 255], K = [0, 0, 0], BGL = [248, 244, 242], BGD = [31, 25, 34], ESC = [28, 17, 25];
+  let l = base; for (let i = 0; i < 12 && contr(l, BGL) < 3.2; i++) l = mixC(l, K, .12);
+  let d = base; for (let i = 0; i < 14 && contr(d, BGD) < 4.5; i++) d = mixC(d, W, .12);
+  const on = c => contr(c, W) >= contr(c, ESC) ? '#ffffff' : '#1c1119';
+  return { hero: rgbHex(base), heroOn: on(base), l: rgbHex(l), l2: rgbHex(mixC(l, W, .15)), lSoft: rgbHex(mixC(l, W, .88)), lOn: on(l), d: rgbHex(d), d2: rgbHex(mixC(d, W, .15)), dSoft: rgbHex(mixC(d, BGD, .78)), dOn: on(d) };
+}
+function aplicarTema(cfg = {}) {
+  const p = paleta(cfg.cor || '#7a2e63');
+  const H = `--hero:${p.hero};--on-hero:${p.heroOn}`;
+  const L = `--brand:${p.l};--brand2:${p.l2};--brand-soft:${p.lSoft};--on-brand:${p.lOn};${H}`;
+  const D = `--brand:${p.d};--brand2:${p.d2};--brand-soft:${p.dSoft};--on-brand:${p.dOn};${H}`;
+  let st = document.getElementById('temaSalao');
+  if (!st) { st = document.createElement('style'); st.id = 'temaSalao'; document.head.appendChild(st); }
+  st.textContent = `:root{${L}}@media (prefers-color-scheme:dark){:root:not([data-theme=light]){${D}}}:root[data-theme=dark]{${D}}`;
+  const de = document.documentElement;
+  if (cfg.tema === 'clara') de.dataset.theme = 'light'; else if (cfg.tema === 'escura') de.dataset.theme = 'dark'; else delete de.dataset.theme;
+  const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = p.hero;
+}
+const logoHtml = (cfg, fallback) => cfg.logo ? `<img src="${cfg.logo}" alt="">` : fallback;
+const logoClasse = cfg => cfg.logo ? (cfg.logoFundo === false ? 'img semfundo' : 'img') : '';
+let pwaChave = '';
+async function pwa(cfg = {}, nome = 'Salão', curto = 'Salão', startUrl = null) {
+  const chave = [cfg.cor, cfg.logo ? cfg.logo.length : 0, cfg.logoFundo, nome].join('|'); if (chave === pwaChave) return; pwaChave = chave;
   try {
-    const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); await img.decode();
-    const icons = [192, 512].map(s => { const c = document.createElement('canvas'); c.width = c.height = s; c.getContext('2d').drawImage(img, 0, 0, s, s); return { src: c.toDataURL('image/png'), sizes: `${s}x${s}`, type: 'image/png', purpose: 'any' }; });
-    const base = new URL('./', location.href).href;
-    const man = { name: 'Salão • Gestão', short_name: 'Salão', start_url: base, scope: base, display: 'standalone', background_color: '#f8f4f2', theme_color: '#7a2e63', icons };
+    const p = paleta(cfg.cor || '#7a2e63');
+    const carregar = async src => { const i = new Image(); i.src = src; await i.decode(); return i; };
+    let logo = null; if (cfg.logo) try { logo = await carregar(cfg.logo); } catch (e) { logo = null; }
+    const tes = logo ? null : await carregar('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="${p.heroOn}" stroke-width="1.7" stroke-linecap="round"><circle cx="6.5" cy="17" r="3"/><circle cx="17.5" cy="17" r="3"/><path d="M8.6 14.8 18 3M15.4 14.8 6 3"/></g></svg>`));
+    const icons = [192, 512].map(s => {
+      const c = document.createElement('canvas'); c.width = c.height = s; const x = c.getContext('2d');
+      x.fillStyle = logo && cfg.logoFundo !== false ? '#ffffff' : p.hero; x.fillRect(0, 0, s, s);
+      if (logo) { const box = s * .76, r = Math.min(box / logo.width, box / logo.height), w = logo.width * r, h = logo.height * r; x.drawImage(logo, (s - w) / 2, (s - h) / 2, w, h); }
+      else x.drawImage(tes, s * .22, s * .22, s * .56, s * .56);
+      return { src: c.toDataURL('image/png'), sizes: `${s}x${s}`, type: 'image/png', purpose: 'any' };
+    });
+    const base = new URL('./', location.href).href, start = startUrl || base;
+    const man = { name: nome, short_name: curto.slice(0, 12), id: start, start_url: start, scope: base, display: 'standalone', background_color: '#f8f4f2', theme_color: p.hero, icons };
+    document.querySelectorAll('link[rel=manifest],link[rel=icon],link[rel=apple-touch-icon]').forEach(l => l.remove());
     const add = (rel, href) => { const l = document.createElement('link'); l.rel = rel; l.href = href; document.head.appendChild(l); };
     add('manifest', URL.createObjectURL(new Blob([JSON.stringify(man)], { type: 'application/manifest+json' })));
     add('icon', icons[0].src); add('apple-touch-icon', icons[0].src);

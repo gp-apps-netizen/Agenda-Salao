@@ -76,7 +76,12 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .bar .btn{width:auto;flex:none}
 .pac{border:1px dashed var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px}
 .pac .top{display:flex;justify-content:space-between;gap:10px}
-.pac a{display:inline-block;margin-top:6px;color:var(--brand);font-weight:600;text-decoration:none;font-size:14px}
+.pac a,.pac button.lk{display:inline-block;margin-top:6px;color:var(--brand);font-weight:600;text-decoration:none;font-size:14px;background:none;border:0;padding:0}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface2);border-radius:12px;padding:3px;margin:-2px 0 12px}
+.tabs button{border:0;background:none;border-radius:10px;padding:9px 4px;font-weight:600;font-size:14px;color:var(--muted)}
+.tabs button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.opt .eco{display:inline-block;margin-top:4px;font-size:12px;font-weight:600;color:var(--ok)}
+.aviso-pac{background:var(--brand-soft);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
 .aviso{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;text-align:center;margin-bottom:12px}
 .done{text-align:center;padding:10px 4px}
 .done .ok{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok);display:grid;place-items:center;margin:4px auto 12px}
@@ -138,7 +143,7 @@ const IC = {
 };
 
 const CFG_PADRAO = { nome: 'Agende seu horário', whatsapp: '', endereco: '', instagram: '', online: true, intervalo: 30, antecedencia: 2, diasFrente: 30 };
-const S = { cfg: null, servicos: null, profs: null, pacotes: [], ocup: [], ocupDia: null, sel: { serv: '', prof: '', data: '', hora: '' }, enviando: false, feito: null };
+const S = { cfg: null, servicos: null, profs: null, pacotes: [], ocup: [], ocupDia: null, sel: { serv: '', prof: '', data: '', hora: '', pac: '' }, modo: 'serv', enviando: false, feito: null };
 let db, F, unsubOc = null;
 const SID = (new URLSearchParams(location.search).get('s') || '').trim();
 const col = n => F.collection(db, 'saloes', SID, n);
@@ -146,6 +151,12 @@ const dref = (n, id) => F.doc(db, 'saloes', SID, n, id);
 const LS = k => `${k}:${SID}`;
 
 const servSel = () => S.servicos?.find(s => s.id === S.sel.serv);
+const pacSel = () => S.sel.pac ? S.pacotes.find(p => p.id === S.sel.pac) : null;
+const servsAgendaveis = () => (S.servicos || []).filter(s => s.ativo !== false && (S.profs || []).some(p => p.ativo !== false && profFaz(p, s.id)));
+const servsDoPacote = p => { const ok = servsAgendaveis(); return (p.itens || []).map(i => ok.find(s => s.id === i.servicoId)).filter(Boolean); };
+const pacsAtivos = () => S.pacotes.filter(p => p.ativo !== false && servsDoPacote(p).length);
+const nomeServ = id => S.servicos.find(s => s.id === id)?.nome || 'serviço';
+const economia = p => { const av = (p.itens || []).reduce((t, i) => t + (+S.servicos.find(s => s.id === i.servicoId)?.preco || 0) * (+i.qtd || 0), 0); return av > p.preco ? av - p.preco : 0; };
 const profFaz = (p, sid) => !p.servicos || !p.servicos.length || p.servicos.includes(sid);
 const candidatos = () => { const s = servSel(); if (!s) return []; const l = (S.profs || []).filter(p => p.ativo !== false && profFaz(p, s.id)); return S.sel.prof && S.sel.prof !== 'any' ? l.filter(p => p.id === S.sel.prof) : l; };
 const trabalha = (p, data) => { const h = (p.horarios || {})[parseYmd(data).getDay()]; return !!(h && h.ativo); };
@@ -209,9 +220,24 @@ function render() {
   if (!servs.length) { fl.innerHTML = `<div class="aviso"><p class="muted" style="margin:0">Ainda não há serviços disponíveis para agendar online.</p></div>`; $('#bar').hidden = true; return; }
   const s = servSel();
   let h = '';
-  // 1. serviço
-  const cats = {}; servs.forEach(x => (cats[x.categoria || 'Serviços'] ||= []).push(x));
-  h += `<section class="step ${s ? 'feito' : ''}" id="stServ"><h2><i>1</i>Escolha o serviço</h2>${Object.entries(cats).map(([c, l]) => `${Object.keys(cats).length > 1 ? `<div class="cat">${esc(c)}</div>` : ''}${l.map(x => `<button class="opt ${x.id === S.sel.serv ? 'on' : ''}" data-serv="${x.id}"><span class="g"><b>${esc(x.nome)}</b>${x.descricao ? `<small>${esc(x.descricao)}</small>` : ''}</span><span class="r"><b>${brl(x.preco)}</b><small>${fmtDur(x.duracao)}</small></span></button>`).join('')}`).join('')}</section>`;
+  // 1. serviço ou pacote
+  const pacs = pacsAtivos();
+  if (!pacs.length && S.modo === 'pac') S.modo = 'serv';
+  const tabs = pacs.length ? `<div class="tabs"><button data-modo="serv" class="${S.modo === 'serv' ? 'on' : ''}">Serviço avulso</button><button data-modo="pac" class="${S.modo === 'pac' ? 'on' : ''}">Pacotes</button></div>` : '';
+  let corpo1 = '';
+  if (S.modo === 'pac') {
+    const pk = pacSel();
+    corpo1 = pacs.map(p => { const e = economia(p); return `<button class="opt ${p.id === S.sel.pac ? 'on' : ''}" data-pac="${p.id}"><span class="g"><b>${esc(p.nome)}</b><small>${(p.itens || []).map(i => `${i.qtd}× ${esc(nomeServ(i.servicoId))}`).join(' + ')}</small>${p.descricao ? `<small>${esc(p.descricao)}</small>` : ''}${e ? `<span class="eco">Economize ${brl(e)}</span>` : ''}</span><span class="r"><b>${brl(p.preco)}</b><small>${p.validadeDias ? `válido ${p.validadeDias} dias` : ''}</small></span></button>`; }).join('');
+    if (pk) {
+      const it = servsDoPacote(pk);
+      if (it.length > 1) corpo1 += `<div class="cat" style="margin-top:14px">Qual serviço você quer fazer primeiro?</div>` + it.map(x => `<button class="opt ${x.id === S.sel.serv ? 'on' : ''}" data-serv="${x.id}" data-mantem="1"><span class="g"><b>${esc(x.nome)}</b><small>1ª sessão do pacote</small></span><span class="r"><small>${fmtDur(x.duracao)}</small></span></button>`).join('');
+      corpo1 += `<div class="aviso-pac">Você agenda a 1ª sessão agora. O pagamento do pacote é combinado com o salão na confirmação.</div>`;
+    }
+  } else {
+    const cats = {}; servs.forEach(x => (cats[x.categoria || 'Serviços'] ||= []).push(x));
+    corpo1 = Object.entries(cats).map(([c, l]) => `${Object.keys(cats).length > 1 ? `<div class="cat">${esc(c)}</div>` : ''}${l.map(x => `<button class="opt ${x.id === S.sel.serv ? 'on' : ''}" data-serv="${x.id}"><span class="g"><b>${esc(x.nome)}</b>${x.descricao ? `<small>${esc(x.descricao)}</small>` : ''}</span><span class="r"><b>${brl(x.preco)}</b><small>${fmtDur(x.duracao)}</small></span></button>`).join('')}`).join('');
+  }
+  h += `<section class="step ${s ? 'feito' : ''}" id="stServ"><h2><i>1</i>${S.modo === 'pac' ? 'Escolha o pacote' : 'Escolha o serviço'}</h2>${tabs}${corpo1}</section>`;
   // 2. profissional
   if (s) {
     const ps = (S.profs || []).filter(p => p.ativo !== false && profFaz(p, s.id));
@@ -244,7 +270,7 @@ function render() {
     } else horas = '<p class="muted small" style="margin:4px 2px 0">Escolha um dia para ver os horários.</p>';
     h += `<section class="step ${S.sel.hora ? 'feito' : ''}" id="stData"><h2><i>3</i>Dia e horário</h2><div class="dias" id="dias">${dias}</div>${horas}</section>`;
   }
-  fl.innerHTML = h + (S.sel.hora ? '' : vPacotes());
+  fl.innerHTML = h + (S.sel.hora || S.modo === 'pac' ? '' : vPacotes());
   // dados ficam num bloco fixo para não perder o que foi digitado
   let dados = $('#stDados');
   if (!dados) {
@@ -258,7 +284,7 @@ function render() {
   dados.hidden = !S.sel.hora;
   $('#main').appendChild(dados);
   const pac = $('#stPacFim'); if (pac) pac.remove();
-  if (S.sel.hora && S.pacotes.some(p => p.ativo !== false)) $('#main').insertAdjacentHTML('beforeend', `<div id="stPacFim">${vPacotes()}</div>`);
+  if (S.sel.hora && S.modo !== 'pac' && pacsAtivos().length) $('#main').insertAdjacentHTML('beforeend', `<div id="stPacFim">${vPacotes()}</div>`);
   // dia selecionado visível
   const ds = $('#dias .dia.on'); if (ds) ds.scrollIntoView({ block: 'nearest', inline: 'center' });
   renderBar();
@@ -267,16 +293,17 @@ function renderBar() {
   const s = servSel(), bar = $('#bar');
   if (!s || S.feito) { bar.hidden = true; return; }
   bar.hidden = false;
-  const partes = [s.nome];
+  const pk = pacSel();
+  const partes = pk ? [pk.nome, s.nome] : [s.nome];
   if (S.sel.data) partes.push(parseYmd(S.sel.data).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('.', ''));
   if (S.sel.hora) partes.push(S.sel.hora);
-  $('#barRes').innerHTML = `<b>${esc(partes.join(' · '))}</b><span class="muted">${brl(s.preco)} · ${fmtDur(s.duracao)}</span>`;
+  $('#barRes').innerHTML = `<b>${esc(partes.join(' · '))}</b><span class="muted">${pk ? `Pacote ${brl(pk.preco)}` : brl(s.preco)} · ${fmtDur(s.duracao)}</span>`;
   const b = $('#barBtn');
   b.disabled = S.enviando;
   b.textContent = S.enviando ? 'Enviando…' : S.sel.hora ? 'Agendar' : 'Continuar';
 }
 function vPacotes() {
-  const l = S.pacotes.filter(p => p.ativo !== false);
+  const l = S.cfg.online ? pacsAtivos() : S.pacotes.filter(p => p.ativo !== false);
   if (!l.length) return '';
   const nomeS = id => S.servicos.find(s => s.id === id)?.nome || 'serviço';
   return `<section class="step"><h2>Pacotes</h2>${l.map(p => {
@@ -284,21 +311,21 @@ function vPacotes() {
     return `<div class="pac"><div class="top"><b>${esc(p.nome)}</b><b>${brl(p.preco)}</b></div>
     <div class="muted small">${(p.itens || []).map(i => `${i.qtd}× ${esc(nomeS(i.servicoId))}`).join(' + ')}${avulso > p.preco ? ` · economize ${brl(avulso - p.preco)}` : ''}</div>
     ${p.descricao ? `<div class="small" style="margin-top:4px">${esc(p.descricao)}</div>` : ''}
-    ${S.cfg.whatsapp ? `<a href="${waLink(S.cfg.whatsapp, `Olá! Tenho interesse no pacote "${p.nome}".`)}" target="_blank" rel="noopener">Quero este pacote →</a>` : ''}</div>`;
+    ${S.cfg.online ? `<button class="lk" data-pac="${p.id}">Escolher este pacote →</button>` : S.cfg.whatsapp ? `<a href="${waLink(S.cfg.whatsapp, `Olá! Tenho interesse no pacote "${p.nome}".`)}" target="_blank" rel="noopener">Quero este pacote →</a>` : ''}</div>`;
   }).join('')}</section>`;
 }
 function vFeito() {
   const f = S.feito, c = S.cfg;
   const ini = f.data.replace(/-/g, '') + 'T' + f.hora.replace(':', '') + '00', fim = f.data.replace(/-/g, '') + 'T' + f.fim.replace(':', '') + '00';
   const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`${f.servico} · ${c.nome}`)}&dates=${ini}/${fim}&details=${encodeURIComponent(`Com ${f.prof}. Aguardando confirmação do salão.`)}&location=${encodeURIComponent(c.endereco || '')}`;
-  const msg = `Olá! Acabei de pedir um horário pelo link:\n${f.servico} com ${f.prof}\n${fmtLongo(f.data)} às ${f.hora}\nNome: ${f.nome}`;
+  const msg = `Olá! Acabei de pedir um horário pelo link:\n${f.pacote ? `Pacote: ${f.pacote} (${brl(f.pacotePreco)})\n1ª sessão: ` : ''}${f.servico} com ${f.prof}\n${fmtLongo(f.data)} às ${f.hora}\nNome: ${f.nome}`;
   return `<section class="step done"><div class="ok">${IC.check}</div><h2>Pedido enviado!</h2>
     <p class="muted" style="margin:6px 0 0">O salão vai confirmar seu horário pelo WhatsApp.</p>
-    <div class="resumo"><div><span>Serviço</span><span>${esc(f.servico)}</span></div><div><span>Profissional</span><span>${esc(f.prof)}</span></div><div><span>Data</span><span>${esc(fmtLongo(f.data))}</span></div><div><span>Horário</span><span>${f.hora}</span></div><div><span>Valor</span><span>${brl(f.valor)}</span></div></div>
+    <div class="resumo">${f.pacote ? `<div><span>Pacote</span><span>${esc(f.pacote)}</span></div>` : ''}<div><span>${f.pacote ? '1ª sessão' : 'Serviço'}</span><span>${esc(f.servico)}</span></div><div><span>Profissional</span><span>${esc(f.prof)}</span></div><div><span>Data</span><span>${esc(fmtLongo(f.data))}</span></div><div><span>Horário</span><span>${f.hora}</span></div><div><span>${f.pacote ? 'Valor do pacote' : 'Valor'}</span><span>${brl(f.pacote ? f.pacotePreco : f.valor)}</span></div></div>
     <div class="stack">
       ${c.whatsapp ? `<a class="btn wa" href="${waLink(c.whatsapp, msg)}" target="_blank" rel="noopener">${IC.wa}Avisar o salão no WhatsApp</a>` : ''}
       <a class="btn" href="${gcal}" target="_blank" rel="noopener">${IC.cal}Adicionar à minha agenda</a>
-      <button class="btn" data-novo>Fazer outro agendamento</button>
+      <button class="btn" data-novo="1">Fazer outro agendamento</button>
     </div></section>`;
 }
 
@@ -309,19 +336,32 @@ function autoData() {
   for (let i = 0; i < n; i++) { const d = addDias(hoje(), i); if (candidatos().some(p => trabalha(p, d))) { sel.data = d; break; } }
   if (sel.data) ouvirOcupados(sel.data);
 }
+function escolherServ(id) {
+  const sel = S.sel;
+  if (sel.serv === id) return;
+  sel.serv = id; sel.hora = '';
+  const ps = S.profs.filter(p => p.ativo !== false && profFaz(p, sel.serv));
+  if (sel.prof && sel.prof !== 'any' && !ps.some(p => p.id === sel.prof)) sel.prof = '';
+  if (ps.length === 1) sel.prof = ps[0].id;
+  if (sel.data && !candidatos().some(p => trabalha(p, sel.data))) sel.data = '';
+  if (sel.prof) autoData();
+}
 function rolar(id) { setTimeout(() => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
 document.addEventListener('click', e => {
-  const t = e.target.closest('[data-serv],[data-prof],[data-dia],[data-hora],[data-novo]'); if (!t) return;
+  const t = e.target.closest('[data-serv],[data-prof],[data-dia],[data-hora],[data-novo],[data-modo],[data-pac]'); if (!t) return;
   const sel = S.sel;
-  if (t.dataset.serv) {
-    if (sel.serv !== t.dataset.serv) {
-      sel.serv = t.dataset.serv; sel.hora = '';
-      const ps = S.profs.filter(p => p.ativo !== false && profFaz(p, sel.serv));
-      if (sel.prof && sel.prof !== 'any' && !ps.some(p => p.id === sel.prof)) sel.prof = '';
-      if (ps.length === 1) sel.prof = ps[0].id;
-      if (sel.data && !candidatos().some(p => trabalha(p, sel.data))) sel.data = '';
-      if (sel.prof) autoData();
-    }
+  if (t.dataset.modo) {
+    if (S.modo !== t.dataset.modo) { S.modo = t.dataset.modo; sel.pac = ''; sel.serv = ''; sel.hora = ''; }
+    render();
+  } else if (t.dataset.pac) {
+    S.modo = 'pac';
+    if (sel.pac !== t.dataset.pac) { sel.pac = t.dataset.pac; sel.serv = ''; sel.hora = ''; }
+    const it = servsDoPacote(pacSel() || {});
+    if (it.length === 1) { escolherServ(it[0].id); render(); rolar(sel.prof ? 'stData' : 'stProf'); }
+    else { render(); rolar('stServ'); }
+  } else if (t.dataset.serv) {
+    if (!t.dataset.mantem) sel.pac = '';
+    escolherServ(t.dataset.serv);
     render(); rolar(sel.prof ? 'stData' : 'stProf');
   } else if (t.dataset.prof) {
     sel.prof = t.dataset.prof; sel.hora = '';
@@ -332,8 +372,8 @@ document.addEventListener('click', e => {
     sel.data = t.dataset.dia; sel.hora = ''; ouvirOcupados(sel.data); render();
   } else if (t.dataset.hora) {
     sel.hora = t.dataset.hora; render(); rolar('stDados'); setTimeout(() => { if (!$('#dNome').value) $('#dNome').focus({ preventScroll: true }); }, 400);
-  } else if (t.dataset.novo) {
-    S.feito = null; S.sel = { serv: '', prof: '', data: '', hora: '' }; render(); window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else if ('novo' in t.dataset) {
+    S.feito = null; S.modo = 'serv'; S.sel = { serv: '', prof: '', data: '', hora: '', pac: '' }; render(); window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 });
 $('#barBtn').addEventListener('click', () => {
@@ -353,16 +393,16 @@ async function agendar() {
   // sem preferência: escolhe quem tem menos horários marcados no dia
   const p = livres.slice().sort((a, b) => S.ocup.filter(o => o.profId === a.id).length - S.ocup.filter(o => o.profId === b.id).length)[0];
   const fim = toHM(Math.min(toMin(S.sel.hora) + (+s.duracao || 30), 23 * 60 + 59));
-  const sel = { ...S.sel };
+  const sel = { ...S.sel }, pk = pacSel();
   S.enviando = true; renderBar();
   try {
     const ref = F.doc(col('agendamentos'));
     const b = F.writeBatch(db);
-    b.set(ref, { data: sel.data, ini: sel.hora, fim, profId: p.id, profNome: p.nome, servicoId: s.id, servicoNome: s.nome, valor: +s.preco || 0, clienteNome: nome, telefone: tel, obs, status: 'pendente', origem: 'online', tipo: 'normal', criadoEm: F.serverTimestamp() });
+    b.set(ref, { data: sel.data, ini: sel.hora, fim, profId: p.id, profNome: p.nome, servicoId: s.id, servicoNome: s.nome, valor: +s.preco || 0, clienteNome: nome, telefone: tel, obs, status: 'pendente', origem: 'online', tipo: 'normal', ...(pk ? { pacoteId: pk.id, pacoteNome: pk.nome } : {}), criadoEm: F.serverTimestamp() });
     b.set(dref("ocupados", ref.id), { data: sel.data, profId: p.id, ini: sel.hora, fim });
     await b.commit();
     try { localStorage.setItem('meusDados', JSON.stringify({ nome, tel })); localStorage.setItem(LS('ultimoAgendamento'), JSON.stringify({ servico: s.nome, data: sel.data, hora: sel.hora })); } catch (e) {}
-    S.feito = { servico: s.nome, prof: p.nome, data: sel.data, hora: sel.hora, fim, valor: s.preco, nome };
+    S.feito = { servico: s.nome, prof: p.nome, data: sel.data, hora: sel.hora, fim, valor: s.preco, nome, ...(pk ? { pacote: pk.nome, pacotePreco: pk.preco } : {}) };
     $('#stDados').hidden = true; const pf = $('#stPacFim'); if (pf) pf.remove();
     render(); window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (e) {

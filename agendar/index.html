@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7a2e63">
+<title>Agendar horário</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f8f4f2;--surface:#fff;--surface2:#f3ecee;--ink:#2a1f27;--muted:#7b6b75;--line:#e9dfe3;--brand:#7a2e63;--brand-soft:#f4e6ef;--on-brand:#fff;--ok:#2f855a;--shadow:0 1px 2px rgba(42,31,39,.06),0 6px 20px rgba(42,31,39,.06);--r:16px;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#141016;--surface:#1f1922;--surface2:#2a222e;--ink:#f4edf2;--muted:#a8989f;--line:#352c39;--brand:#d68cc0;--brand-soft:#3a2536;--on-brand:#1c1119;--ok:#5fc08a;--shadow:none;color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;margin:0;letter-spacing:-.01em}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.muted{color:var(--muted)}.small{font-size:13px}
+.hero{background:var(--brand);color:var(--on-brand);padding:calc(28px + env(safe-area-inset-top)) 20px 44px;text-align:center;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:auto -20% -60px;height:90px;background:var(--bg);border-radius:50% 50% 0 0}
+.hero .logo{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.16);display:grid;place-items:center;margin:0 auto 12px}
+.hero .logo svg{width:30px;height:30px}
+.hero h1{font-size:28px;line-height:1.15}
+.hero p{margin:6px 0 0;opacity:.85;font-size:14px}
+.hero .acts{display:flex;justify-content:center;gap:8px;margin-top:14px;position:relative;z-index:1;flex-wrap:wrap}
+.hero .acts a{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);color:inherit;text-decoration:none;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600}
+.wrap{max-width:620px;margin:-18px auto 0;padding:0 16px calc(120px + env(safe-area-inset-bottom));position:relative;z-index:1}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);scroll-margin-top:12px}
+.step h2{font-size:19px;display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.step h2 i{font-style:normal;font-family:Inter,sans-serif;font-size:12px;font-weight:700;width:24px;height:24px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center}
+.step.feito h2 i{background:var(--brand);color:var(--on-brand)}
+.cat{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:14px 2px 6px}
+.cat:first-child{margin-top:0}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.opt .g{flex:1;min-width:0}
+.opt .g b{display:block}
+.opt .g small{display:block;color:var(--muted);font-size:13px}
+.opt .r{text-align:right;white-space:nowrap}
+.opt .r b{display:block}
+.opt .r small{color:var(--muted);font-size:12px}
+.opt.on{border-color:var(--brand);background:var(--brand-soft);box-shadow:0 0 0 1px var(--brand) inset}
+.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none;font-size:14px}
+.dias{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none;scroll-snap-type:x proximity}
+.dias::-webkit-scrollbar{display:none}
+.dia{flex:none;width:58px;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:1px;scroll-snap-align:start}
+.dia small{font-size:11px;color:var(--muted);text-transform:uppercase}
+.dia b{font-size:19px}
+.dia em{font-style:normal;font-size:10px;color:var(--muted);text-transform:uppercase}
+.dia:disabled{opacity:.35}
+.dia.on{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.dia.on small,.dia.on em{color:var(--on-brand)}
+.turno{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:12px 2px 6px}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px}
+.slot{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 0;font-weight:600}
+.slot.on{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
+.fld{display:block;margin-bottom:12px}
+.fld>span{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 5px 2px;text-transform:uppercase;letter-spacing:.03em}
+.fld input,.fld textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;outline:0;min-height:46px}
+.fld input:focus,.fld textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:13px 16px;font-weight:600;text-decoration:none;color:var(--ink);min-height:48px;width:100%}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.btn.wa{background:#1f9d55;border-color:#1f9d55;color:#fff}
+.btn:disabled{opacity:.5}
+.stack>*+*{margin-top:8px}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -6px 24px rgba(42,31,39,.08)}
+.bar .in{max-width:620px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.bar .res{flex:1;min-width:0;font-size:13px}
+.bar .res b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .btn{width:auto;flex:none}
+.pac{border:1px dashed var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.pac .top{display:flex;justify-content:space-between;gap:10px}
+.pac a{display:inline-block;margin-top:6px;color:var(--brand);font-weight:600;text-decoration:none;font-size:14px}
+.aviso{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;text-align:center;margin-bottom:12px}
+.done{text-align:center;padding:10px 4px}
+.done .ok{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok);display:grid;place-items:center;margin:4px auto 12px}
+.done .ok svg{width:34px;height:34px;stroke-width:2.4}
+.done h2{font-size:24px}
+.resumo{background:var(--surface2);border-radius:14px;padding:12px 14px;text-align:left;margin:14px 0}
+.resumo div{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
+.resumo div span:first-child{color:var(--muted)}
+.resumo div span:last-child{font-weight:600;text-align:right}
+.spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--brand);border-radius:50%;animation:rot .8s linear infinite;margin:30px auto}
+@keyframes rot{to{transform:rotate(360deg)}}
+.ult{display:flex;align-items:center;gap:10px;background:var(--brand-soft);border-radius:14px;padding:10px 14px;margin-bottom:12px;font-size:14px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="logo"><svg class="i" viewBox="0 0 24 24"><circle cx="6.5" cy="17" r="3"/><circle cx="17.5" cy="17" r="3"/><path d="M8.6 14.8 18 3M15.4 14.8 6 3"/></svg></div>
+  <h1 id="hNome">Agende seu horário</h1>
+  <p id="hEnd"></p>
+  <div class="acts" id="hActs"></div>
+</header>
+<main class="wrap" id="main">
+  <div id="topo"></div>
+  <div id="fluxo"><div class="step"><div class="spin"></div></div></div>
+</main>
+<div class="bar" id="bar" hidden><div class="in"><div class="res" id="barRes"></div><button class="btn pri" id="barBtn">Continuar</button></div></div>
+<script type="module">
+import { firebaseConfig } from '../firebase-config.js';
+
+const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
+const configurado = !!(firebaseConfig && firebaseConfig.apiKey && !/COLE/i.test(firebaseConfig.apiKey));
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const brl = v => (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const hoje = () => ymd(new Date());
+const parseYmd = s => { const [y, m, d] = String(s).split('-').map(Number); return new Date(y, m - 1, d); };
+const addDias = (s, n) => { const d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); };
+const toMin = s => { const [h, m] = String(s || '0:0').split(':').map(Number); return (h || 0) * 60 + (m || 0); };
+const toHM = m => `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
+const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const soDig = s => String(s || '').replace(/\D/g, '');
+const fmtDur = m => { m = +m || 0; const h = Math.floor(m / 60), r = m % 60; return h ? `${h}h${r ? pad(r) : ''}` : `${r} min`; };
+const fmtLongo = s => parseYmd(s).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+const waLink = (tel, msg) => { let n = soDig(tel); if (n && n.length <= 11) n = '55' + n; return `https://wa.me/${n}?text=${encodeURIComponent(msg)}`; };
+const iniciais = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
+const IC = {
+  wa: '<svg class="i" viewBox="0 0 24 24"><path d="M20.5 11.6a8.5 8.5 0 0 1-12.6 7.5L3.5 20.5l1.4-4.2a8.5 8.5 0 1 1 15.6-4.7z"/><path d="M9 8.6c.3 2.8 2.9 5.8 6 6.2l1-1.4-1.9-1-1 .8c-1-.4-2-1.4-2.4-2.4l.8-1-1-1.9z"/></svg>',
+  pin: '<svg class="i" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+  ig: '<svg class="i" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6"/></svg>',
+  check: '<svg class="i" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  cal: '<svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  users: '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.7-4 3.8-6 8-6s7.3 2 8 6"/></svg>',
+};
+
+const CFG_PADRAO = { nome: 'Agende seu horário', whatsapp: '', endereco: '', instagram: '', online: true, intervalo: 30, antecedencia: 2, diasFrente: 30 };
+const S = { cfg: null, servicos: null, profs: null, pacotes: [], ocup: [], ocupDia: null, sel: { serv: '', prof: '', data: '', hora: '' }, enviando: false, feito: null };
+let db, F, unsubOc = null;
+const SID = (new URLSearchParams(location.search).get('s') || '').trim();
+const col = n => F.collection(db, 'saloes', SID, n);
+const dref = (n, id) => F.doc(db, 'saloes', SID, n, id);
+const LS = k => `${k}:${SID}`;
+
+const servSel = () => S.servicos?.find(s => s.id === S.sel.serv);
+const profFaz = (p, sid) => !p.servicos || !p.servicos.length || p.servicos.includes(sid);
+const candidatos = () => { const s = servSel(); if (!s) return []; const l = (S.profs || []).filter(p => p.ativo !== false && profFaz(p, s.id)); return S.sel.prof && S.sel.prof !== 'any' ? l.filter(p => p.id === S.sel.prof) : l; };
+const trabalha = (p, data) => { const h = (p.horarios || {})[parseYmd(data).getDay()]; return !!(h && h.ativo); };
+
+function slotsLivres(p, dur, data, oc, step, minStart) {
+  const h = (p.horarios || {})[parseYmd(data).getDay()];
+  if (!h || !h.ativo) return [];
+  const a = toMin(h.ini), b = toMin(h.fim);
+  const pi = h.pIni && h.pFim ? toMin(h.pIni) : null, pf = h.pIni && h.pFim ? toMin(h.pFim) : null;
+  const occ = oc.filter(o => o.profId === p.id).map(o => [toMin(o.ini), toMin(o.fim)]);
+  step = Math.max(5, +step || 30); dur = Math.max(5, +dur || 30);
+  const out = [];
+  for (let t = a; t + dur <= b; t += step) {
+    if (minStart != null && t < minStart) continue;
+    if (pi != null && t < pf && t + dur > pi) continue;
+    if (occ.some(([x, y]) => t < y && t + dur > x)) continue;
+    out.push(toHM(t));
+  }
+  return out;
+}
+function minStartDe(data) {
+  const lim = Date.now() + (+S.cfg.antecedencia || 0) * 3600e3;
+  const m = Math.ceil((lim - parseYmd(data).getTime()) / 60000);
+  return m > 0 ? m : null;
+}
+// horários livres por profissional para o dia selecionado: { 'HH:MM': [profs...] }
+function mapaHoras() {
+  const s = servSel(), d = S.sel.data; if (!s || !d || S.ocupDia !== d) return null;
+  const min = minStartDe(d), mapa = {};
+  for (const p of candidatos()) for (const t of slotsLivres(p, s.duracao, d, S.ocup, S.cfg.intervalo, min)) (mapa[t] ||= []).push(p);
+  return mapa;
+}
+
+/* ---------- render ---------- */
+function renderTopo() {
+  const c = S.cfg;
+  document.title = `Agendar · ${c.nome}`;
+  $('#hNome').textContent = c.nome;
+  $('#hEnd').textContent = c.endereco || '';
+  const acts = [];
+  if (c.whatsapp) acts.push(`<a href="${waLink(c.whatsapp, 'Olá! Vim pelo link de agendamento.')}" target="_blank" rel="noopener">${IC.wa}WhatsApp</a>`);
+  if (c.endereco) acts.push(`<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.endereco)}" target="_blank" rel="noopener">${IC.pin}Como chegar</a>`);
+  if (c.instagram) acts.push(`<a href="https://instagram.com/${encodeURIComponent(c.instagram.replace(/^@/, '').replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/\/$/, ''))}" target="_blank" rel="noopener">${IC.ig}Instagram</a>`);
+  $('#hActs').innerHTML = acts.join('');
+  let ult = null; try { ult = JSON.parse(localStorage.getItem(LS('ultimoAgendamento')) || 'null'); } catch (e) {}
+  $('#topo').innerHTML = ult && ult.data >= hoje() && !S.feito ? `<div class="ult">${IC.cal}<span>Seu pedido: <b>${esc(ult.servico)}</b>, ${esc(fmtLongo(ult.data))} às ${esc(ult.hora)}. O salão confirma pelo WhatsApp.</span></div>` : '';
+}
+function render() {
+  if (!S.cfg || !S.servicos || !S.profs) return;
+  renderTopo();
+  const fl = $('#fluxo');
+  if (S.feito) { fl.innerHTML = vFeito(); $('#bar').hidden = true; return; }
+  if (!S.cfg.online) {
+    fl.innerHTML = `<div class="aviso"><h2 style="font-size:20px;margin-bottom:6px">Agendamento pelo WhatsApp</h2><p class="muted" style="margin:0 0 14px">No momento os horários estão sendo marcados direto com o salão.</p>${S.cfg.whatsapp ? `<a class="btn wa" href="${waLink(S.cfg.whatsapp, 'Olá! Gostaria de agendar um horário.')}" target="_blank" rel="noopener">${IC.wa}Chamar no WhatsApp</a>` : ''}</div>` + vPacotes();
+    $('#bar').hidden = true; return;
+  }
+  const servs = S.servicos.filter(s => s.ativo !== false && (S.profs || []).some(p => p.ativo !== false && profFaz(p, s.id)));
+  if (!servs.length) { fl.innerHTML = `<div class="aviso"><p class="muted" style="margin:0">Ainda não há serviços disponíveis para agendar online.</p></div>`; $('#bar').hidden = true; return; }
+  const s = servSel();
+  let h = '';
+  // 1. serviço
+  const cats = {}; servs.forEach(x => (cats[x.categoria || 'Serviços'] ||= []).push(x));
+  h += `<section class="step ${s ? 'feito' : ''}" id="stServ"><h2><i>1</i>Escolha o serviço</h2>${Object.entries(cats).map(([c, l]) => `${Object.keys(cats).length > 1 ? `<div class="cat">${esc(c)}</div>` : ''}${l.map(x => `<button class="opt ${x.id === S.sel.serv ? 'on' : ''}" data-serv="${x.id}"><span class="g"><b>${esc(x.nome)}</b>${x.descricao ? `<small>${esc(x.descricao)}</small>` : ''}</span><span class="r"><b>${brl(x.preco)}</b><small>${fmtDur(x.duracao)}</small></span></button>`).join('')}`).join('')}</section>`;
+  // 2. profissional
+  if (s) {
+    const ps = (S.profs || []).filter(p => p.ativo !== false && profFaz(p, s.id));
+    h += `<section class="step ${S.sel.prof ? 'feito' : ''}" id="stProf"><h2><i>2</i>Com quem?</h2>
+      ${ps.length > 1 ? `<button class="opt ${S.sel.prof === 'any' ? 'on' : ''}" data-prof="any"><span class="av" style="background:var(--muted)">${IC.users}</span><span class="g"><b>Sem preferência</b><small>Mostra todos os horários livres</small></span></button>` : ''}
+      ${ps.map(p => `<button class="opt ${S.sel.prof === p.id ? 'on' : ''}" data-prof="${p.id}"><span class="av" style="background:${esc(p.cor || '#7a2e63')}">${esc(iniciais(p.nome))}</span><span class="g"><b>${esc(p.nome)}</b>${p.especialidade ? `<small>${esc(p.especialidade)}</small>` : ''}</span></button>`).join('')}</section>`;
+  }
+  // 3. dia e horário
+  if (s && S.sel.prof) {
+    const cands = candidatos();
+    let dias = '';
+    const n = Math.min(180, Math.max(1, +S.cfg.diasFrente || 30));
+    for (let i = 0; i < n; i++) {
+      const d = addDias(hoje(), i), dt = parseYmd(d);
+      const ok = cands.some(p => trabalha(p, d));
+      dias += `<button class="dia ${d === S.sel.data ? 'on' : ''}" data-dia="${d}" ${ok ? '' : 'disabled'}><small>${i === 0 ? 'Hoje' : DIAS[dt.getDay()]}</small><b>${dt.getDate()}</b><em>${MESES[dt.getMonth()]}</em></button>`;
+    }
+    let horas = '';
+    if (S.sel.data) {
+      const mapa = mapaHoras();
+      if (!mapa) horas = '<div class="spin" style="margin:14px auto"></div>';
+      else {
+        const ts = Object.keys(mapa).sort();
+        if (!ts.length) horas = `<p class="muted small" style="margin:8px 2px">Sem horários livres neste dia. Tente outra data${cands.length === 1 && (S.profs || []).filter(p => p.ativo !== false && profFaz(p, s.id)).length > 1 ? ' ou outra profissional' : ''}.</p>`;
+        else {
+          const turnos = [['Manhã', 0, 720], ['Tarde', 720, 1080], ['Noite', 1080, 1440]];
+          horas = turnos.map(([t, a, b]) => { const l = ts.filter(x => toMin(x) >= a && toMin(x) < b); return l.length ? `<div class="turno">${t}</div><div class="slots">${l.map(x => `<button class="slot ${x === S.sel.hora ? 'on' : ''}" data-hora="${x}">${x}</button>`).join('')}</div>` : ''; }).join('');
+        }
+      }
+    } else horas = '<p class="muted small" style="margin:4px 2px 0">Escolha um dia para ver os horários.</p>';
+    h += `<section class="step ${S.sel.hora ? 'feito' : ''}" id="stData"><h2><i>3</i>Dia e horário</h2><div class="dias" id="dias">${dias}</div>${horas}</section>`;
+  }
+  fl.innerHTML = h + (S.sel.hora ? '' : vPacotes());
+  // dados ficam num bloco fixo para não perder o que foi digitado
+  let dados = $('#stDados');
+  if (!dados) {
+    dados = document.createElement('section'); dados.className = 'step'; dados.id = 'stDados';
+    dados.innerHTML = `<h2><i>4</i>Seus dados</h2>
+      <label class="fld"><span>Nome</span><input id="dNome" autocomplete="name" maxlength="80" placeholder="Seu nome completo"></label>
+      <label class="fld"><span>WhatsApp</span><input id="dTel" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="(11) 90000-0000"></label>
+      <label class="fld" style="margin:0"><span>Observação (opcional)</span><textarea id="dObs" rows="2" maxlength="300" placeholder="Alguma informação para o salão?"></textarea></label>`;
+    try { const u = JSON.parse(localStorage.getItem('meusDados') || 'null'); if (u) { dados.querySelector('#dNome').value = u.nome || ''; dados.querySelector('#dTel').value = u.tel || ''; } } catch (e) {}
+  }
+  dados.hidden = !S.sel.hora;
+  $('#main').appendChild(dados);
+  const pac = $('#stPacFim'); if (pac) pac.remove();
+  if (S.sel.hora && S.pacotes.some(p => p.ativo !== false)) $('#main').insertAdjacentHTML('beforeend', `<div id="stPacFim">${vPacotes()}</div>`);
+  // dia selecionado visível
+  const ds = $('#dias .dia.on'); if (ds) ds.scrollIntoView({ block: 'nearest', inline: 'center' });
+  renderBar();
+}
+function renderBar() {
+  const s = servSel(), bar = $('#bar');
+  if (!s) { bar.hidden = true; return; }
+  bar.hidden = false;
+  const partes = [s.nome];
+  if (S.sel.data) partes.push(parseYmd(S.sel.data).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('.', ''));
+  if (S.sel.hora) partes.push(S.sel.hora);
+  $('#barRes').innerHTML = `<b>${esc(partes.join(' · '))}</b><span class="muted">${brl(s.preco)} · ${fmtDur(s.duracao)}</span>`;
+  const b = $('#barBtn');
+  b.disabled = S.enviando;
+  b.textContent = S.enviando ? 'Enviando…' : S.sel.hora ? 'Agendar' : 'Continuar';
+}
+function vPacotes() {
+  const l = S.pacotes.filter(p => p.ativo !== false);
+  if (!l.length) return '';
+  const nomeS = id => S.servicos.find(s => s.id === id)?.nome || 'serviço';
+  return `<section class="step"><h2>Pacotes</h2>${l.map(p => {
+    const avulso = (p.itens || []).reduce((t, i) => t + (+S.servicos.find(s => s.id === i.servicoId)?.preco || 0) * (+i.qtd || 0), 0);
+    return `<div class="pac"><div class="top"><b>${esc(p.nome)}</b><b>${brl(p.preco)}</b></div>
+    <div class="muted small">${(p.itens || []).map(i => `${i.qtd}× ${esc(nomeS(i.servicoId))}`).join(' + ')}${avulso > p.preco ? ` · economize ${brl(avulso - p.preco)}` : ''}</div>
+    ${p.descricao ? `<div class="small" style="margin-top:4px">${esc(p.descricao)}</div>` : ''}
+    ${S.cfg.whatsapp ? `<a href="${waLink(S.cfg.whatsapp, `Olá! Tenho interesse no pacote "${p.nome}".`)}" target="_blank" rel="noopener">Quero este pacote →</a>` : ''}</div>`;
+  }).join('')}</section>`;
+}
+function vFeito() {
+  const f = S.feito, c = S.cfg;
+  const ini = f.data.replace(/-/g, '') + 'T' + f.hora.replace(':', '') + '00', fim = f.data.replace(/-/g, '') + 'T' + f.fim.replace(':', '') + '00';
+  const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`${f.servico} · ${c.nome}`)}&dates=${ini}/${fim}&details=${encodeURIComponent(`Com ${f.prof}. Aguardando confirmação do salão.`)}&location=${encodeURIComponent(c.endereco || '')}`;
+  const msg = `Olá! Acabei de pedir um horário pelo link:\n${f.servico} com ${f.prof}\n${fmtLongo(f.data)} às ${f.hora}\nNome: ${f.nome}`;
+  return `<section class="step done"><div class="ok">${IC.check}</div><h2>Pedido enviado!</h2>
+    <p class="muted" style="margin:6px 0 0">O salão vai confirmar seu horário pelo WhatsApp.</p>
+    <div class="resumo"><div><span>Serviço</span><span>${esc(f.servico)}</span></div><div><span>Profissional</span><span>${esc(f.prof)}</span></div><div><span>Data</span><span>${esc(fmtLongo(f.data))}</span></div><div><span>Horário</span><span>${f.hora}</span></div><div><span>Valor</span><span>${brl(f.valor)}</span></div></div>
+    <div class="stack">
+      ${c.whatsapp ? `<a class="btn wa" href="${waLink(c.whatsapp, msg)}" target="_blank" rel="noopener">${IC.wa}Avisar o salão no WhatsApp</a>` : ''}
+      <a class="btn" href="${gcal}" target="_blank" rel="noopener">${IC.cal}Adicionar à minha agenda</a>
+      <button class="btn" data-novo>Fazer outro agendamento</button>
+    </div></section>`;
+}
+
+/* ---------- eventos ---------- */
+function autoData() {
+  const sel = S.sel; if (sel.data) return;
+  const n = Math.max(1, +S.cfg.diasFrente || 30);
+  for (let i = 0; i < n; i++) { const d = addDias(hoje(), i); if (candidatos().some(p => trabalha(p, d))) { sel.data = d; break; } }
+  if (sel.data) ouvirOcupados(sel.data);
+}
+function rolar(id) { setTimeout(() => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-serv],[data-prof],[data-dia],[data-hora],[data-novo]'); if (!t) return;
+  const sel = S.sel;
+  if (t.dataset.serv) {
+    if (sel.serv !== t.dataset.serv) {
+      sel.serv = t.dataset.serv; sel.hora = '';
+      const ps = S.profs.filter(p => p.ativo !== false && profFaz(p, sel.serv));
+      if (sel.prof && sel.prof !== 'any' && !ps.some(p => p.id === sel.prof)) sel.prof = '';
+      if (ps.length === 1) sel.prof = ps[0].id;
+      if (sel.data && !candidatos().some(p => trabalha(p, sel.data))) sel.data = '';
+      if (sel.prof) autoData();
+    }
+    render(); rolar(sel.prof ? 'stData' : 'stProf');
+  } else if (t.dataset.prof) {
+    sel.prof = t.dataset.prof; sel.hora = '';
+    if (sel.data && !candidatos().some(p => trabalha(p, sel.data))) sel.data = '';
+    autoData();
+    render(); rolar('stData');
+  } else if (t.dataset.dia) {
+    sel.data = t.dataset.dia; sel.hora = ''; ouvirOcupados(sel.data); render();
+  } else if (t.dataset.hora) {
+    sel.hora = t.dataset.hora; render(); rolar('stDados'); setTimeout(() => { if (!$('#dNome').value) $('#dNome').focus({ preventScroll: true }); }, 400);
+  } else if (t.dataset.novo) {
+    S.feito = null; S.sel = { serv: '', prof: '', data: '', hora: '' }; render(); window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
+$('#barBtn').addEventListener('click', () => {
+  const s = S.sel;
+  if (!s.prof) return rolar('stProf');
+  if (!s.hora) return rolar('stData');
+  agendar();
+});
+
+async function agendar() {
+  const nome = $('#dNome').value.trim(), tel = $('#dTel').value.trim(), obs = $('#dObs').value.trim();
+  if (nome.length < 2) { rolar('stDados'); $('#dNome').focus(); return alert('Informe seu nome.'); }
+  if (soDig(tel).length < 10) { rolar('stDados'); $('#dTel').focus(); return alert('Informe seu WhatsApp com DDD.'); }
+  const s = servSel(), mapa = mapaHoras();
+  const livres = mapa && mapa[S.sel.hora];
+  if (!livres || !livres.length) { alert('Esse horário acabou de ser ocupado. Escolha outro, por favor.'); S.sel.hora = ''; render(); rolar('stData'); return; }
+  // sem preferência: escolhe quem tem menos horários marcados no dia
+  const p = livres.slice().sort((a, b) => S.ocup.filter(o => o.profId === a.id).length - S.ocup.filter(o => o.profId === b.id).length)[0];
+  const fim = toHM(Math.min(toMin(S.sel.hora) + (+s.duracao || 30), 23 * 60 + 59));
+  S.enviando = true; renderBar();
+  try {
+    const ref = F.doc(col('agendamentos'));
+    const b = F.writeBatch(db);
+    b.set(ref, { data: S.sel.data, ini: S.sel.hora, fim, profId: p.id, profNome: p.nome, servicoId: s.id, servicoNome: s.nome, valor: +s.preco || 0, clienteNome: nome, telefone: tel, obs, status: 'pendente', origem: 'online', tipo: 'normal', criadoEm: F.serverTimestamp() });
+    b.set(dref('ocupados', ref.id), { data: S.sel.data, profId: p.id, ini: S.sel.hora, fim });
+    await b.commit();
+    try { localStorage.setItem('meusDados', JSON.stringify({ nome, tel })); localStorage.setItem(LS('ultimoAgendamento'), JSON.stringify({ servico: s.nome, data: S.sel.data, hora: S.sel.hora })); } catch (e) {}
+    S.feito = { servico: s.nome, prof: p.nome, data: S.sel.data, hora: S.sel.hora, fim, valor: s.preco, nome };
+    $('#stDados').hidden = true; const pf = $('#stPacFim'); if (pf) pf.remove();
+    render(); window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) {
+    console.error(e); alert('Não foi possível enviar o pedido. Verifique a internet e tente de novo.');
+  } finally { S.enviando = false; renderBar(); }
+}
+
+/* ---------- firebase ---------- */
+function ouvirOcupados(data) {
+  if (unsubOc) unsubOc();
+  S.ocupDia = null;
+  unsubOc = F.onSnapshot(F.query(col('ocupados'), F.where('data', '==', data)), snap => {
+    S.ocup = snap.docs.map(d => ({ id: d.id, ...d.data() })); S.ocupDia = data;
+    if (S.sel.hora && !(mapaHoras()?.[S.sel.hora] || []).length) S.sel.hora = '';
+    render();
+  }, e => { console.error(e); S.ocup = []; S.ocupDia = data; render(); });
+}
+async function init() {
+  pwa();
+  if (!configurado || !SID) { $('#fluxo').innerHTML = '<div class="aviso"><p class="muted" style="margin:0">Link de agendamento incompleto. Peça o link certo ao salão.</p></div>'; return; }
+  try {
+    const [A, Fs] = await Promise.all([import(FB + 'firebase-app.js'), import(FB + 'firebase-firestore.js')]);
+    F = Fs; db = F.getFirestore(A.initializeApp(firebaseConfig));
+    const mapa = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
+    const erro = e => { console.error(e); $('#bar').hidden = true; $('#fluxo').innerHTML = `<div class="aviso"><p class="muted" style="margin:0">${e && e.code === 'permission-denied' ? 'A agenda online deste salão não está disponível no momento.' : 'Não foi possível carregar os horários. Tente de novo em instantes.'}</p></div>`; };
+    F.onSnapshot(dref('config', 'salao'), s => { S.cfg = { ...CFG_PADRAO, ...(s.exists() ? s.data() : {}) }; render(); }, erro);
+    F.onSnapshot(col('servicos'), s => { S.servicos = mapa(s).sort((a, b) => (a.categoria || '').localeCompare(b.categoria || '') || a.nome.localeCompare(b.nome)); render(); }, erro);
+    F.onSnapshot(col('profissionais'), s => { S.profs = mapa(s).sort((a, b) => a.nome.localeCompare(b.nome)); render(); }, erro);
+    F.onSnapshot(col('pacotes'), s => { S.pacotes = mapa(s); render(); }, () => {});
+  } catch (e) { console.error(e); $('#fluxo').innerHTML = '<div class="aviso"><p class="muted" style="margin:0">Sem conexão. Verifique a internet.</p></div>'; }
+}
+async function pwa() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#7a2e63"/><g transform="translate(96 96) scale(13.33)" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"><circle cx="6.5" cy="17" r="3"/><circle cx="17.5" cy="17" r="3"/><path d="M8.6 14.8 18 3M15.4 14.8 6 3"/></g></svg>`;
+  try {
+    const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); await img.decode();
+    const icons = [192, 512].map(s => { const c = document.createElement('canvas'); c.width = c.height = s; c.getContext('2d').drawImage(img, 0, 0, s, s); return { src: c.toDataURL('image/png'), sizes: `${s}x${s}`, type: 'image/png', purpose: 'any' }; });
+    const base = new URL('./', location.href).href;
+    const man = { name: 'Agendar horário', short_name: 'Agendar', id: location.href.split('#')[0], start_url: location.href.split('#')[0], scope: base, display: 'standalone', background_color: '#f8f4f2', theme_color: '#7a2e63', icons };
+    const add = (rel, href) => { const l = document.createElement('link'); l.rel = rel; l.href = href; document.head.appendChild(l); };
+    add('manifest', URL.createObjectURL(new Blob([JSON.stringify(man)], { type: 'application/manifest+json' })));
+    add('icon', icons[0].src); add('apple-touch-icon', icons[0].src);
+  } catch (e) {}
+}
+init();
+</script>
+</body>
+</html>

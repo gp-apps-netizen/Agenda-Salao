@@ -239,7 +239,7 @@ table.t td.n,table.t th.n{text-align:right}
 <script type="module">
 import { firebaseConfig } from '../firebase-config.js';
 
-const VERSAO = '1.8';
+const VERSAO = '1.9';
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const configurado = !!(firebaseConfig && firebaseConfig.apiKey && !/COLE/i.test(firebaseConfig.apiKey));
 
@@ -332,7 +332,25 @@ const dref = (n, id) => F.doc(db, 'saloes', SID, n, id);
 
 const servById = id => S.servicos.find(x => x.id === id);
 const profById = id => S.profs.find(x => x.id === id);
-const cliById = id => S.clientes.find(x => x.id === id);
+const cliById = id => S.clientes.find(x => x.id === id) || (S.cliCache || {})[id];
+/* clientes carregam só quando alguma tela precisa (economiza leituras ao abrir o app) */
+let unsubCli = null, promCli = null;
+function garantirClientes() {
+  if (promCli) return promCli;
+  promCli = new Promise(ok => {
+    unsubCli = F.onSnapshot(col('clientes'), s => {
+      S.clientes = s.docs.map(d => ({ id: d.id, ...d.data() })).sort(porNome); S.clientesOk = true; ok(); render();
+      document.querySelectorAll('datalist[data-clis]').forEach(dl => dl.innerHTML = opcoesClientes(dl.dataset.clis === 'tel'));
+    }, e => { console.error(e); ok(); });
+  });
+  return promCli;
+}
+const opcoesClientes = (tel = true) => S.clientes.map(c => `<option value="${esc(c.nome)}">${tel ? esc(telFmt(c.telefone)) : ''}</option>`).join('');
+async function carregarCliente(id) {
+  if (!id || cliById(id)) return cliById(id);
+  try { const d = await F.getDoc(dref('clientes', id)); if (d.exists()) { (S.cliCache ||= {})[id] = { id, ...d.data() }; return S.cliCache[id]; } } catch (e) {}
+  return null;
+}
 const agById = id => S.ags.find(x => x.id === id);
 const nomeProf = a => profById(a.profId)?.nome || a.profNome || '—';
 const profFaz = (p, sid) => !p.servicos || !p.servicos.length || p.servicos.includes(sid);
@@ -480,6 +498,7 @@ function sheetPendentes() {
 function sheetAg(id) {
   const a = agById(id); if (!a) return closeSheet();
   const cli = a.clienteId && cliById(a.clienteId);
+  if (a.clienteId && !cli && !S.clientesOk) carregarCliente(a.clienteId).then(c => { if (c && agById(id) && !$('#sheet').hidden && $('#sheetBody').innerHTML.includes(`data-id="${id}"`)) sheetAg(id); });
   const tel = a.telefone || cli?.telefone || '';
   if (a.tipo === 'bloqueio') {
     return openSheet(head('Horário bloqueado', `${fmtDia(a.data)} · ${a.ini === '00:00' && a.fim === '23:59' ? 'dia inteiro' : a.ini + '–' + a.fim}`) +
@@ -519,6 +538,7 @@ function sheetAg(id) {
 }
 
 async function vincularCliente(nome, tel, criar = true) {
+  await garantirClientes();
   const d = soDig(tel);
   let c = d.length >= 8 ? S.clientes.find(x => soDig(x.telefone) === d) : null;
   if (!c && nome) c = S.clientes.find(x => norm(x.nome) === norm(nome) && (!d || !soDig(x.telefone)));
@@ -554,13 +574,14 @@ async function devolverSessao(a) {
 }
 
 function formAg(id, preset = {}) {
+  garantirClientes();
   const a = id ? agById(id) : null;
   const v = { clienteNome: '', telefone: '', clienteId: '', servicoId: '', profId: S.filtroProf !== 'todos' ? S.filtroProf : '', data: S.dia, ini: '', obs: '', valor: '', ...(a || {}), ...preset };
   const servs = S.servicos.filter(s => s.ativo !== false || s.id === v.servicoId);
   openSheet(head(a ? 'Editar agendamento' : 'Novo agendamento') + `
   <form id="fAg" data-id="${id || ''}" autocomplete="off">
     <label class="fld"><span>Cliente</span><input id="agCli" list="dlCli" required placeholder="Nome da cliente"></label>
-    <datalist id="dlCli">${S.clientes.map(c => `<option value="${esc(c.nome)}">${esc(telFmt(c.telefone))}</option>`).join('')}</datalist>
+    <datalist id="dlCli" data-clis="tel">${opcoesClientes(true)}</datalist>
     <input type="hidden" id="agCliId">
     <label class="fld"><span>WhatsApp</span><input id="agTel" type="tel" inputmode="tel" placeholder="(11) 90000-0000"></label>
     <label class="fld"><span>Serviço</span><select id="agServ" required><option value="">Escolha…</option>${servs.map(s => `<option value="${s.id}">${esc(s.nome)} · ${fmtDur(s.duracao)} · ${brl(s.preco)}</option>`).join('')}</select></label>
@@ -707,6 +728,7 @@ async function salvarReceber(form) {
 
 /* ---------- CLIENTES ---------- */
 function vClientes() {
+  if (!S.clientesOk) { garantirClientes(); return '<div class="spin"></div>'; }
   const mes = pad(new Date().getMonth() + 1), q = norm(S.cliBusca), qd = soDig(S.cliBusca);
   let l = S.clientes;
   if (S.cliFiltro === 'aniv') l = l.filter(c => (c.nascimento || '').slice(5, 7) === mes).sort((a, b) => a.nascimento.slice(8).localeCompare(b.nascimento.slice(8)));
@@ -731,7 +753,7 @@ function vClientes() {
 function sheetCli(id) {
   const c = cliById(id); if (!c) return closeSheet();
   const mes = pad(new Date().getMonth() + 1);
-  const cps = S.cpacotes.filter(cp => cp.clienteId === id).sort((a, b) => (b.data || '').localeCompare(a.data || ''));
+  let cps = S.cpacotes.filter(cp => cp.clienteId === id).sort((a, b) => (b.data || '').localeCompare(a.data || ''));
   const prox = S.ags.filter(a => a.clienteId === id && a.data >= hoje() && ['pendente', 'confirmado'].includes(a.status)).sort(porDataHora);
   const aniv = (c.nascimento || '').slice(5, 7) === mes;
   openSheet(head(esc(c.nome), [telFmt(c.telefone), c.nascimento ? `Aniversário ${c.nascimento.slice(8)}/${c.nascimento.slice(5, 7)}` : ''].filter(Boolean).join(' · ')) + `
@@ -743,16 +765,16 @@ function sheetCli(id) {
     </div>
     ${c.obs ? `<div class="note"><b>Preferências e anotações</b>\n${esc(c.obs)}</div>` : ''}
     ${prox.length ? `<div class="sec-t"><h3>Próximos horários</h3></div>${prox.map(cardAg).join('')}` : ''}
-    ${cps.length ? `<div class="sec-t"><h3>Pacotes</h3></div>${cps.map(cp => `<div class="card" style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(cp.pacoteNome)}</b>${cpAtivo(cp) ? '<span class="pill ok">Ativo</span>' : `<span class="pill off">${restantes(cp) ? 'Vencido' : 'Encerrado'}</span>`}</div>
-      <div class="muted small">Comprado em ${fmtBR(cp.data)} · ${brl(cp.valor)} · válido até ${fmtBR(cp.validade)}</div>
-      <div style="margin-top:6px">${cp.itens.map(i => `<div class="small" style="display:flex;justify-content:space-between"><span>${esc(i.servicoNome)}</span><b>${i.usados}/${i.qtd} usadas</b></div>`).join('')}</div>
-      <button class="btn sm ghost danger" style="margin-top:6px;padding-left:0" data-act="excluirCp" data-id="${cp.id}" data-cli="${id}">${ICON.trash}Excluir pacote</button>
-    </div>`).join('')}` : ''}
+    <div id="cliPacs">${htmlPacotesCli(cps, id)}</div>
     <div class="sec-t"><h3>Histórico</h3><span class="muted small" id="histResumo"></span></div>
     <div id="hist"><div class="spin" style="margin:16px auto"></div></div>
     <button class="btn ghost full" data-act="editarCli" data-id="${id}" style="margin-top:8px">${ICON.edit}Editar cadastro</button>
   `, async () => {
+    try {
+      const sp = await F.getDocs(F.query(col('clientePacotes'), F.where('clienteId', '==', id)));
+      cps = sp.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.data || '').localeCompare(a.data || ''));
+      const box = $('#cliPacs'); if (box) box.innerHTML = htmlPacotesCli(cps, id);
+    } catch (e) { console.error(e); }
     try {
       const snap = await F.getDocs(F.query(col('agendamentos'), F.where('clienteId', '==', id)));
       const l = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(a => a.data < hoje() || a.status === 'concluido').sort((a, b) => porDataHora(b, a));
@@ -763,6 +785,14 @@ function sheetCli(id) {
       el.innerHTML = l.length ? l.slice(0, 30).map(a => { const st = STATUS[a.status] || STATUS.pendente; return `<div class="row" style="cursor:default"><span class="grow"><b>${esc(a.servicoNome)}</b><span>${fmtBR(a.data)} · ${esc(a.profNome || nomeProf(a))}</span></span><span class="r">${a.status === 'concluido' ? (a.formaPg === 'Pacote' ? 'Pacote' : brl(a.valorCobrado)) : `<span class="pill ${st.c}">${st.t}</span>`}</span></div>`; }).join('') : '<p class="muted small">Nenhum atendimento anterior.</p>';
     } catch (e) { console.error(e); const el = $('#hist'); if (el) el.innerHTML = '<p class="muted small">Não foi possível carregar o histórico.</p>'; }
   });
+}
+function htmlPacotesCli(cps, id) {
+  return cps.length ? `<div class="sec-t"><h3>Pacotes</h3></div>${cps.map(cp => `<div class="card" style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(cp.pacoteNome)}</b>${cpAtivo(cp) ? '<span class="pill ok">Ativo</span>' : `<span class="pill off">${restantes(cp) ? 'Vencido' : 'Encerrado'}</span>`}</div>
+      <div class="muted small">Comprado em ${fmtBR(cp.data)} · ${brl(cp.valor)} · válido até ${fmtBR(cp.validade)}</div>
+      <div style="margin-top:6px">${cp.itens.map(i => `<div class="small" style="display:flex;justify-content:space-between"><span>${esc(i.servicoNome)}</span><b>${i.usados}/${i.qtd} usadas</b></div>`).join('')}</div>
+      <button class="btn sm ghost danger" style="margin-top:6px;padding-left:0" data-act="excluirCp" data-id="${cp.id}" data-cli="${id}">${ICON.trash}Excluir pacote</button>
+    </div>`).join('')}` : '';
 }
 function formCli(id) {
   const c = id ? cliById(id) : { nome: '', telefone: '', nascimento: '', obs: '' };
@@ -777,6 +807,7 @@ function formCli(id) {
   </form>`, () => { $('#clNome').value = c.nome || ''; $('#clTel').value = c.telefone || ''; $('#clNasc').value = c.nascimento || ''; $('#clObs').value = c.obs || ''; });
 }
 async function salvarCli(form) {
+  await garantirClientes();
   const id = form.dataset.id;
   const dados = { nome: $('#clNome').value.trim(), telefone: $('#clTel').value.trim(), nascimento: $('#clNasc').value, obs: $('#clObs').value.trim() };
   if (!dados.nome) return toast('Informe o nome');
@@ -835,10 +866,10 @@ async function carregarRel() {
   S.relCarregando = true; render();
   try {
     const faixa = (c, campo) => F.getDocs(F.query(col(c), F.where(campo, '>=', de), F.where(campo, '<=', ate)));
-    const [s1, s2, s3, s4] = await Promise.all([faixa('agendamentos', 'data'), faixa('agendamentos', 'pagoEm'), faixa('vendas', 'data'), faixa('movimentos', 'data')]);
+    const [s1, s2, s3, s4, s5] = await Promise.all([faixa('agendamentos', 'data'), faixa('agendamentos', 'pagoEm'), faixa('vendas', 'data'), faixa('movimentos', 'data'), faixa('clientePacotes', 'data')]);
     const m = new Map(); [...s1.docs, ...s2.docs].forEach(d => m.set(d.id, { id: d.id, ...d.data() }));
     const lst = sn => sn.docs.map(d => ({ id: d.id, ...d.data() }));
-    S.relDados = { de, ate, ags: [...m.values()], vprod: lst(s3), movs: lst(s4) };
+    S.relDados = { de, ate, ags: [...m.values()], vprod: lst(s3), movs: lst(s4), cpsPer: lst(s5) };
   } catch (e) { console.error(e); toast('Erro ao carregar relatório'); S.relDados = { de, ate, ags: [], vprod: [], movs: [] }; }
   S.relCarregando = false; render();
 }
@@ -848,7 +879,7 @@ function calcRel() {
   const todos = ags.filter(a => a.tipo !== 'bloqueio');
   const at = todos.filter(a => noPer(a.data));                       // agenda do período (faltas, cancelados, pedidos)
   const conc = todos.filter(a => a.status === 'concluido' && noPer(a.pagoEm || a.data));   // caixa: pelo dia do pagamento
-  const vendas = S.cpacotes.filter(cp => cp.data >= de && cp.data <= ate);
+  const vendas = S.relDados.cpsPer || S.cpacotes.filter(cp => cp.data >= de && cp.data <= ate);
   const recServ = conc.reduce((s, a) => s + (+a.valorCobrado || 0), 0);
   const recPac = vendas.reduce((s, cp) => s + (+cp.valor || 0), 0);
   const formas = {};
@@ -1233,6 +1264,7 @@ async function salvarAjuste(form) {
 }
 let carrinho = [];
 function formVendaProd(preset = {}) {
+  garantirClientes();
   const ativos = S.produtos.filter(p => p.ativo !== false);
   if (!ativos.length) return toast('Cadastre um produto primeiro');
   carrinho = [];
@@ -1244,7 +1276,7 @@ function formVendaProd(preset = {}) {
     <div class="grid2"><label class="fld"><span>Desconto (R$)</span><input id="vpDesc" inputmode="decimal" placeholder="0,00"></label>
       <div class="fld"><span>Total</span><div id="vpTotal" style="font-family:var(--fh);font-size:24px;padding-top:4px"></div></div></div>
     <label class="fld"><span>Cliente (opcional)</span><input id="vpCli" list="dlCliV" autocomplete="off"></label>
-    <datalist id="dlCliV">${S.clientes.map(c => `<option value="${esc(c.nome)}">`).join('')}</datalist>
+    <datalist id="dlCliV" data-clis="">${opcoesClientes(false)}</datalist>
     <label class="fld"><span>Vendido por (opcional)</span><select id="vpVend"><option value="">—</option>${S.profs.filter(p => p.ativo !== false).map(p => `<option value="${p.id}">${esc(p.nome)}</option>`).join('')}</select></label>
     <div class="fld"><span>Forma de pagamento</span><div class="radios">${FORMAS.map((f, i) => `<label><input type="radio" name="vpForma" value="${f}" ${i === 0 ? 'checked' : ''}><span>${f}</span></label>`).join('')}</div></div>
     <button class="btn pri full">${ICON.check}Registrar venda</button>
@@ -1284,6 +1316,7 @@ async function salvarVendaProd(form) {
   const falta = carrinho.filter(i => i.qtd > (+prodById(i.produtoId)?.estoque || 0));
   if (falta.length && !confirm(`Estoque insuficiente de ${falta.map(i => prodById(i.produtoId)?.nome).join(', ')}. Registrar a venda mesmo assim?`)) return;
   const sub = carrinho.reduce((s, i) => s + i.qtd * (+i.preco || 0), 0), desc = r2(Math.min(sub, num($('#vpDesc').value) || 0));
+  await garantirClientes();
   const cliNome = $('#vpCli').value.trim(), cli = S.clientes.find(c => norm(c.nome) === norm(cliNome));
   const vend = profById($('#vpVend').value), forma = document.querySelector('[name=vpForma]:checked')?.value || 'Pix';
   form.querySelector('button.pri').disabled = true;
@@ -1543,10 +1576,10 @@ const ACT = {
     closeSheet(); toast('Excluído');
   },
   cliFiltro: d => { S.cliFiltro = d.f; render(); },
-  verCli: d => sheetCli(d.id),
+  verCli: async d => { await garantirClientes(); sheetCli(d.id); },
   novoCli: () => formCli(null),
   editarCli: d => formCli(d.id),
-  agendarCli: d => { const c = cliById(d.id); formAg(null, { clienteId: c.id, clienteNome: c.nome, telefone: c.telefone || '' }); },
+  agendarCli: async d => { await garantirClientes(); const c = cliById(d.id); formAg(null, { clienteId: c.id, clienteNome: c.nome, telefone: c.telefone || '' }); },
   venderPac: d => formVenderPac(d.id),
   prodFiltro: d => { S.prodFiltro = d.f; render(); },
   verProd: d => sheetProd(d.id), novoProd: () => formProd(null), editProd: d => formProd(d.id),
@@ -1635,15 +1668,15 @@ function ouvir() {
   L(col('profissionais'), s => S.profs = mapa(s).sort(porNome));
   L(col('pacotes'), s => S.pacotes = mapa(s).sort(porNome));
   L(dref('privado', 'comissoes'), s => S.comissoes = s.exists() ? s.data() : {});
-  L(col('clientes'), s => S.clientes = mapa(s).sort(porNome));
-  L(col('clientePacotes'), s => S.cpacotes = mapa(s));
+  L(F.query(col('clientePacotes'), F.where('validade', '>=', hoje())), s => S.cpacotes = mapa(s));
   L(col('produtos'), s => S.produtos = mapa(s).sort(porNome));
-  L(F.query(col('vendas'), F.where('data', '>=', addDias(hoje(), -30))), s => S.vendas = mapa(s));
+  L(F.query(col('vendas'), F.where('data', '>=', addDias(hoje(), -7))), s => S.vendas = mapa(s));
   ouvirAgs();
 }
 function ouvirAgs() {
   if (unsubAgs) unsubAgs();
-  S.janela = addDias(S.dia < hoje() ? S.dia : hoje(), -14);
+  const semana = d => addDias(d, -parseYmd(d).getDay());
+  S.janela = semana(S.dia < hoje() ? S.dia : hoje());
   unsubAgs = F.onSnapshot(F.query(col('agendamentos'), F.where('data', '>=', S.janela)), s => {
     S.ags = s.docs.map(d => ({ id: d.id, ...d.data() }));
     render();
@@ -1670,7 +1703,7 @@ async function carregarAparenciaLogin() {
   } catch (e) { /* salão suspenso ou inexistente: fica o visual padrão */ }
 }
 async function entrouSaiu(u) {
-  pararOuvir(); if (unsubSalao) unsubSalao(); unsubSalao = null;
+  pararOuvir(); if (unsubSalao) unsubSalao(); unsubSalao = null; if (unsubCli) unsubCli(); unsubCli = null; promCli = null; S.clientesOk = false; S.cliCache = {};
   Object.assign(S, { user: u, acesso: null, suporte: false, salao: null, ags: [], servicos: [], profs: [], pacotes: [], clientes: [], cpacotes: [], produtos: [], vendas: [], comissoes: {}, relDados: null, cfg: { ...CFG_PADRAO } });
   SID = null; rascunho = {}; S.cfgSujo = false;
   if (!u) { loginCfg = lerAparenciaLocal() || loginCfg; aplicarLogin(); S.pronto = true; render(); return; }

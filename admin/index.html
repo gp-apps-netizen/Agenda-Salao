@@ -9,68 +9,68 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--hero:#7a2e63;--on-hero:#fff;--bg:#f8f4f2;--surface:#fff;--surface2:#f3ecee;--ink:#2a1f27;--muted:#7b6b75;--line:#e9dfe3;--brand:#7a2e63;--brand2:#9c3f80;--brand-soft:#f4e6ef;--on-brand:#fff;--ok:#2f855a;--warn:#b7791f;--info:#2f6fb0;--bad:#c0392b;--off:#8a8a8a;--shadow:0 1px 2px rgba(42,31,39,.06),0 6px 20px rgba(42,31,39,.06);--r:14px;color-scheme:light}
+:root{--fh:'Fraunces',Georgia,serif;--fb:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;--hw:600;--rk:1;--pill:999px;--tt:none;--ls:-.01em;--hero:#7a2e63;--on-hero:#fff;--bg:#f8f4f2;--surface:#fff;--surface2:#f3ecee;--ink:#2a1f27;--muted:#7b6b75;--line:#e9dfe3;--brand:#7a2e63;--brand2:#9c3f80;--brand-soft:#f4e6ef;--on-brand:#fff;--ok:#2f855a;--warn:#b7791f;--info:#2f6fb0;--bad:#c0392b;--off:#8a8a8a;--shadow:0 1px 2px rgba(42,31,39,.06),0 6px 20px rgba(42,31,39,.06);--r:calc(var(--rk) * 14px);color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#141016;--surface:#1f1922;--surface2:#2a222e;--ink:#f4edf2;--muted:#a8989f;--line:#352c39;--brand:#d68cc0;--brand2:#e3a6d0;--brand-soft:#3a2536;--on-brand:#1c1119;--ok:#5fc08a;--warn:#e0b050;--info:#6aa7e6;--bad:#ef7a6c;--off:#8d8590;--shadow:none;color-scheme:dark}}
 :root[data-theme=dark]{--bg:#141016;--surface:#1f1922;--surface2:#2a222e;--ink:#f4edf2;--muted:#a8989f;--line:#352c39;--brand:#d68cc0;--brand2:#e3a6d0;--brand-soft:#3a2536;--on-brand:#1c1119;--ok:#5fc08a;--warn:#e0b050;--info:#6aa7e6;--bad:#ef7a6c;--off:#8d8590;--shadow:none;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--fb)}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
-h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;margin:0;letter-spacing:-.01em}
+h1,h2,h3{font-family:var(--fh);font-weight:var(--hw);margin:0;letter-spacing:var(--ls);text-transform:var(--tt)}
 svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .muted{color:var(--muted)}.small{font-size:13px}.center{text-align:center}
 .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
-.brand b{display:block;font-family:Fraunces,serif;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand b{display:block;font-family:var(--fh);font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brand small{display:block;color:var(--muted);font-size:12px}
-.logo{width:36px;height:36px;border-radius:10px;background:var(--hero);color:var(--on-hero);display:grid;place-items:center;flex:none;overflow:hidden}
+.logo{width:36px;height:36px;border-radius:calc(var(--rk) * 10px);background:var(--hero);color:var(--on-hero);display:grid;place-items:center;flex:none;overflow:hidden}
 .logo.img{background:#fff;padding:2px}.logo.img.semfundo{background:transparent;padding:0}.logo img{width:100%;height:100%;object-fit:contain;display:block}
 .logo-edit{display:flex;align-items:center;gap:14px}
-.logo-prev{width:84px;height:84px;border-radius:18px;background:var(--hero);color:var(--on-hero);display:grid;place-items:center;flex:none;overflow:hidden;border:1px solid var(--line)}
+.logo-prev{width:84px;height:84px;border-radius:calc(var(--rk) * 18px);background:var(--hero);color:var(--on-hero);display:grid;place-items:center;flex:none;overflow:hidden;border:1px solid var(--line)}
 .logo-prev.img{background:#fff;padding:6px}.logo-prev.img.semfundo{background:repeating-conic-gradient(var(--surface2) 0 25%,var(--surface) 0 50%) 0 0/14px 14px;padding:0}.logo-prev img{width:100%;height:100%;object-fit:contain}.logo-prev svg{width:40px;height:40px}
 .cores .custom{position:relative;width:30px;height:30px;border-radius:50%;border:2px dashed var(--muted);display:grid;place-items:center;overflow:hidden;font-weight:700;color:var(--muted)}
 .cores .custom input{position:absolute;inset:-6px;width:44px;height:44px;opacity:0;cursor:pointer}
 .cores .custom.on{border:3px solid var(--ink)}
-.prev-hero{border-radius:14px;background:var(--hero);color:var(--on-hero);padding:14px;display:flex;align-items:center;gap:12px;margin-top:4px}
-.prev-hero .logo{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.18)}
+.prev-hero{border-radius:calc(var(--rk) * 14px);background:var(--hero);color:var(--on-hero);padding:14px;display:flex;align-items:center;gap:12px;margin-top:4px}
+.prev-hero .logo{width:44px;height:44px;border-radius:calc(var(--rk) * 12px);background:rgba(255,255,255,.18)}
 .prev-hero .logo.img{background:#fff}.prev-hero .logo.img.semfundo{background:transparent}
-.prev-hero b{font-family:Fraunces,serif;font-size:17px;display:block}.prev-hero small{opacity:.85}
+.prev-hero b{font-family:var(--fh);font-size:17px;display:block}.prev-hero small{opacity:.85}
 .logo svg{width:22px;height:22px}
 .view{max-width:760px;margin:0 auto;padding:14px 16px calc(96px + env(safe-area-inset-bottom))}
 .bottom{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:space-around;background:var(--surface);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
 .txt-bad{color:var(--bad)!important;font-weight:600}
-.cart{display:grid;grid-template-columns:1fr auto 76px 28px;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:6px}
+.cart{display:grid;grid-template-columns:1fr auto 76px 28px;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:calc(var(--rk) * 12px);padding:8px 10px;margin-bottom:6px}
 .cart-n{min-width:0}.cart-n b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cart-n small{font-size:12px}
-.cart-q{display:flex;align-items:center;gap:6px}.cart-q button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);font-weight:700}
+.cart-q{display:flex;align-items:center;gap:6px}.cart-q button{width:28px;height:28px;border-radius:calc(var(--rk) * 8px);border:1px solid var(--line);background:var(--surface2);font-weight:700}
 .cart-q span{min-width:18px;text-align:center;font-weight:600}
-.cart-p{width:100%;border:1px solid var(--line);border-radius:8px;padding:6px;background:var(--surface);text-align:right;font-size:14px}
+.cart-p{width:100%;border:1px solid var(--line);border-radius:calc(var(--rk) * 8px);padding:6px;background:var(--surface);text-align:right;font-size:14px}
 .cart-x{border:0;background:none;color:var(--bad);padding:0}.cart-x svg{width:18px;height:18px}
-.bottom button{flex:1;max-width:120px;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;color:var(--muted);font-size:10.5px;font-weight:500;position:relative;border-radius:10px;min-width:0}
+.bottom button{flex:1;max-width:120px;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;color:var(--muted);font-size:10.5px;font-weight:500;position:relative;border-radius:calc(var(--rk) * 10px);min-width:0}
 .bottom button.on{color:var(--brand)}
 .bottom button.on svg{stroke-width:2.2}
-.badge{position:absolute;top:2px;left:calc(50% + 6px);background:var(--bad);color:#fff;font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+.badge{position:absolute;top:2px;left:calc(50% + 6px);background:var(--bad);color:#fff;font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:calc(var(--rk) * 9px);display:grid;place-items:center;padding:0 4px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--shadow)}
 .stack>*+*{margin-top:10px}
 .sec-t{display:flex;align-items:center;justify-content:space-between;margin:18px 2px 8px}
 .sec-t h3{font-size:16px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 14px;font-weight:600;text-decoration:none;color:var(--ink);min-height:44px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:calc(var(--rk) * 12px);padding:11px 14px;font-weight:600;text-decoration:none;color:var(--ink);min-height:44px}
 .btn.pri{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
 .btn.soft{background:var(--brand-soft);border-color:transparent;color:var(--brand)}
 .btn.ghost{background:none;border-color:transparent}
 .btn.danger{color:var(--bad)}
 .btn.wa{background:#1f9d55;border-color:#1f9d55;color:#fff}
 .btn.full{width:100%}
-.btn.sm{min-height:34px;padding:6px 11px;font-size:13px;border-radius:10px}
+.btn.sm{min-height:34px;padding:6px 11px;font-size:13px;border-radius:calc(var(--rk) * 10px)}
 .btn:disabled{opacity:.5}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .btns .full2{grid-column:1/-1}
-.icon-btn{background:var(--surface);border:1px solid var(--line);border-radius:10px;height:36px;min-width:36px;padding:0 10px;display:inline-grid;place-items:center;font-weight:600;font-size:13px}
+.icon-btn{background:var(--surface);border:1px solid var(--line);border-radius:calc(var(--rk) * 10px);height:36px;min-width:36px;padding:0 10px;display:inline-grid;place-items:center;font-weight:600;font-size:13px}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:var(--pill);padding:7px 13px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--pc,var(--brand));flex:none}
-.pill{font-size:11px;font-weight:600;border-radius:999px;padding:3px 8px;white-space:nowrap}
+.pill{font-size:11px;font-weight:600;border-radius:var(--pill);padding:3px 8px;white-space:nowrap}
 .pill.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
 .pill.info{background:color-mix(in srgb,var(--info) 16%,transparent);color:var(--info)}
 .pill.ok{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
@@ -79,10 +79,10 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .pill.brand{background:var(--brand-soft);color:var(--brand)}
 /* agenda */
 .daynav{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.daynav .dlabel{flex:1;text-align:center;font-family:Fraunces,serif;font-size:18px;background:none;border:0;padding:6px;position:relative}
+.daynav .dlabel{flex:1;text-align:center;font-family:var(--fh);font-size:18px;background:none;border:0;padding:6px;position:relative}
 .daynav input{position:absolute;inset:0;opacity:0;width:100%}
 .week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
-.wd{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 0 4px;display:flex;flex-direction:column;align-items:center;gap:1px}
+.wd{background:var(--surface);border:1px solid var(--line);border-radius:calc(var(--rk) * 12px);padding:6px 0 4px;display:flex;flex-direction:column;align-items:center;gap:1px}
 .wd small{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .wd b{font-size:16px}
 .wd i{font-style:normal;font-size:10px;font-weight:700;color:var(--brand);min-height:14px}
@@ -102,7 +102,7 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .ag.st-cancelado,.ag.st-faltou{opacity:.6}
 .empty{text-align:center;padding:36px 16px;color:var(--muted)}
 .empty svg{width:40px;height:40px;opacity:.5;margin-bottom:6px}
-.fab{position:fixed;right:18px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:21;width:56px;height:56px;border-radius:18px;border:0;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;box-shadow:0 6px 20px rgba(122,46,99,.35)}
+.fab{position:fixed;right:18px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:21;width:56px;height:56px;border-radius:calc(var(--rk) * 18px);border:0;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;box-shadow:0 6px 20px rgba(122,46,99,.35)}
 .fab svg{width:26px;height:26px}
 @media(min-width:800px){.fab{right:calc(50% - 360px)}}
 /* list rows */
@@ -115,15 +115,15 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .row.inativo{opacity:.55}
 .av{width:40px;height:40px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-weight:700;flex:none;font-size:14px}
 .tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
-.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px;margin-bottom:8px}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:calc(var(--rk) * 12px);padding:0 12px;margin-bottom:8px}
 .search input{border:0;background:none;outline:0;padding:11px 0;flex:1;min-width:0}
-.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface2);border-radius:12px;padding:3px;margin-bottom:12px}
-.seg button{border:0;background:none;border-radius:10px;padding:8px 4px;font-weight:600;font-size:13px;color:var(--muted)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface2);border-radius:calc(var(--rk) * 12px);padding:3px;margin-bottom:12px}
+.seg button{border:0;background:none;border-radius:calc(var(--rk) * 10px);padding:8px 4px;font-weight:600;font-size:13px;color:var(--muted)}
 .seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 /* forms */
 .fld{display:block;margin-bottom:12px}
 .fld>span{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 5px 2px;text-transform:uppercase;letter-spacing:.03em}
-.fld input:not([type=checkbox]):not([type=radio]),.fld select,.fld textarea,.inp{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px;outline:0;min-height:44px}
+.fld input:not([type=checkbox]):not([type=radio]),.fld select,.fld textarea,.inp{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:calc(var(--rk) * 12px);padding:11px 12px;outline:0;min-height:44px}
 .fld textarea{resize:vertical}
 .fld input:focus,.fld select:focus,.fld textarea:focus,.inp:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -133,16 +133,16 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .check{display:flex;align-items:center;gap:10px;padding:10px 0;font-weight:500}
 .check input{width:20px;height:20px;accent-color:var(--brand)}
 .slots{display:flex;flex-wrap:wrap;gap:6px}
-.slot{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 10px;font-weight:600;font-size:14px;min-width:62px}
+.slot{border:1px solid var(--line);background:var(--surface);border-radius:calc(var(--rk) * 10px);padding:8px 10px;font-weight:600;font-size:14px;min-width:62px}
 .slot.on{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
 .opts{display:grid;gap:6px;margin-bottom:12px}
-.opt{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:var(--surface)}
+.opt{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:calc(var(--rk) * 12px);padding:11px 12px;background:var(--surface)}
 .opt input{accent-color:var(--brand);width:18px;height:18px}
 .opt:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
 .radios{display:flex;flex-wrap:wrap;gap:6px}
 .radios label{position:relative}
 .radios input{position:absolute;opacity:0}
-.radios span{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-weight:600;font-size:14px;background:var(--surface)}
+.radios span{display:inline-block;border:1px solid var(--line);border-radius:var(--pill);padding:8px 14px;font-weight:600;font-size:14px;background:var(--surface)}
 .radios input:checked+span{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .cores{display:flex;gap:8px;flex-wrap:wrap}
 .cores label{position:relative}
@@ -150,15 +150,15 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .cores span{display:block;width:30px;height:30px;border-radius:50%;border:3px solid transparent}
 .cores input:checked+span{border-color:var(--ink)}
 .hrs{display:grid;gap:6px}
-.hr{display:grid;grid-template-columns:62px 1fr;gap:8px;align-items:start;border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.hr{display:grid;grid-template-columns:62px 1fr;gap:8px;align-items:start;border:1px solid var(--line);border-radius:calc(var(--rk) * 12px);padding:8px 10px}
 .hr .d{display:flex;align-items:center;gap:6px;font-weight:600;padding-top:8px}
 .hr .d input{accent-color:var(--brand);width:18px;height:18px}
 .hr .t{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.hr .t input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 8px;font-size:14px}
+.hr .t input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:calc(var(--rk) * 9px);padding:7px 8px;font-size:14px}
 .hr .t small{grid-column:1/-1;color:var(--muted);font-size:11px;margin-top:2px}
 .hr.off .t{opacity:.35;pointer-events:none}
 .itens .it{display:grid;grid-template-columns:1fr 70px 36px;gap:6px;margin-bottom:6px}
-.itens select,.itens input{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 8px;min-width:0}
+.itens select,.itens input{background:var(--surface);border:1px solid var(--line);border-radius:calc(var(--rk) * 10px);padding:9px 8px;min-width:0}
 .itens button{border:0;background:none;color:var(--bad)}
 /* sheet */
 .sheet-wrap{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
@@ -175,7 +175,7 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .kv{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:14px}
 .kv dt{color:var(--muted);font-size:13px}
 .kv dd{margin:0;font-weight:500;text-align:right;word-break:break-word}
-.note{background:var(--surface2);border-radius:12px;padding:10px 12px;font-size:14px;white-space:pre-wrap;margin-bottom:12px}
+.note{background:var(--surface2);border-radius:calc(var(--rk) * 12px);padding:10px 12px;font-size:14px;white-space:pre-wrap;margin-bottom:12px}
 /* caixa */
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
@@ -183,7 +183,7 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .kpi b{display:block;font-size:20px;margin-top:2px;font-variant-numeric:tabular-nums}
 .kpi.big{grid-column:1/-1;background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
 .kpi.big small{color:var(--on-brand);opacity:.85}
-.kpi.big b{font-size:28px;font-family:Fraunces,serif}
+.kpi.big b{font-size:28px;font-family:var(--fh)}
 .bars .b{margin-bottom:10px}
 .bars .b div{display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px;gap:10px}
 .bars .b div span:last-child{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -196,16 +196,38 @@ table.t td.n,table.t th.n{text-align:right}
 /* login */
 .login{min-height:100vh;display:grid;place-items:center;padding:24px}
 .login-card{width:100%;max-width:380px;text-align:center}
-.login-card .logo{width:64px;height:64px;border-radius:18px;margin:0 auto 14px}
+.login-card .logo{width:64px;height:64px;border-radius:calc(var(--rk) * 18px);margin:0 auto 14px}
 .login-card .logo svg{width:36px;height:36px}
-.login-card .logo.img{width:104px;height:104px;border-radius:26px;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.12)}.login-card .logo.img.semfundo{padding:0;box-shadow:none}
+.login-card .logo.img{width:104px;height:104px;border-radius:calc(var(--rk) * 26px);padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.12)}.login-card .logo.img.semfundo{padding:0;box-shadow:none}
 .login{background:linear-gradient(180deg,color-mix(in srgb,var(--hero) 14%,var(--bg)),var(--bg) 55%)}
 .login-card h1{font-size:26px}
 .login-card form{text-align:left;margin-top:22px}
-#toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:12px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;z-index:80;max-width:90vw;text-align:center}
+
+/* estilos */
+.prev-hero{position:relative;overflow:hidden}.prev-hero>*{position:relative;z-index:1}
+.prev-hero::before{content:"";position:absolute;inset:0;pointer-events:none}
+:root[data-estilo=delicado] .prev-hero::before{background:radial-gradient(circle at 12% 22%,rgba(255,255,255,.18) 0 22px,transparent 23px),radial-gradient(circle at 90% 30%,rgba(255,255,255,.13) 0 36px,transparent 37px)}
+:root[data-estilo=glamour] .prev-hero::before{inset:auto 10% 6px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent)}
+:root[data-estilo=natural] .prev-hero::before{background:radial-gradient(ellipse at 0 100%,rgba(255,255,255,.14) 0 34%,transparent 35%)}
+:root[data-estilo=rustico] .prev-hero::before{background:repeating-linear-gradient(178deg,rgba(0,0,0,.09) 0 2px,transparent 2px 9px,rgba(255,255,255,.04) 9px 10px,transparent 10px 17px)}
+:root[data-estilo=moderno] .prev-hero::before{inset:auto 0 0 0;height:3px;background:var(--on-hero);opacity:.3}
+:root[data-estilo=vintage] .prev-hero::before{inset:auto 0 0 0;height:8px;background:repeating-linear-gradient(135deg,#c0392b 0 8px,#fff 8px 16px,#1f3a5f 16px 24px,#fff 24px 32px)}
+:root[data-estilo=vintage] .top{border-bottom:0;box-shadow:0 3px 0 0 transparent;background-image:linear-gradient(to top,transparent 0,transparent 100%)}
+:root[data-estilo=vintage] .top::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:4px;background:repeating-linear-gradient(135deg,#c0392b 0 6px,#fff 6px 12px,#1f3a5f 12px 18px,#fff 18px 24px)}
+:root[data-estilo=moderno] .brand b{font-size:20px}
+.ambs{margin-bottom:10px}
+.estilos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.est{position:relative}
+.est input{position:absolute;opacity:0}
+.est .c{display:block;border:1px solid var(--line);background:var(--surface);padding:10px 10px 12px;height:100%;cursor:pointer}
+.est .c b{display:block;font-size:19px;line-height:1.15;margin-bottom:2px}
+.est .c small{display:block;color:var(--muted);font-size:12px;line-height:1.3}
+.est .c i{display:block;height:6px;margin-top:8px;border-radius:3px}
+.est input:checked+.c{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand)}
+#toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:calc(var(--rk) * 12px);font-weight:500;opacity:0;pointer-events:none;transition:.25s;z-index:80;max-width:90vw;text-align:center}
 #toast.on{opacity:1;transform:translateX(-50%)}
-.qr{display:grid;place-items:center;background:#fff;border-radius:14px;padding:16px;margin:10px 0}
-.linkbox{background:var(--surface2);border-radius:10px;padding:10px 12px;font-size:13px;word-break:break-all;margin-bottom:10px}
+.qr{display:grid;place-items:center;background:#fff;border-radius:calc(var(--rk) * 14px);padding:16px;margin:10px 0}
+.linkbox{background:var(--surface2);border-radius:calc(var(--rk) * 10px);padding:10px 12px;font-size:13px;word-break:break-all;margin-bottom:10px}
 .spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--brand);border-radius:50%;animation:rot .8s linear infinite;margin:40px auto}
 @keyframes rot{to{transform:rotate(360deg)}}
 </style>
@@ -217,7 +239,7 @@ table.t td.n,table.t th.n{text-align:right}
 <script type="module">
 import { firebaseConfig } from '../firebase-config.js';
 
-const VERSAO = '1.7';
+const VERSAO = '1.8';
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const configurado = !!(firebaseConfig && firebaseConfig.apiKey && !/COLE/i.test(firebaseConfig.apiKey));
 
@@ -1220,7 +1242,7 @@ function formVendaProd(preset = {}) {
     <label class="fld"><span>Adicionar produto</span><select id="vpAdd">${optsProd('')}</select></label>
     <div id="vpItens"></div>
     <div class="grid2"><label class="fld"><span>Desconto (R$)</span><input id="vpDesc" inputmode="decimal" placeholder="0,00"></label>
-      <div class="fld"><span>Total</span><div id="vpTotal" style="font-family:Fraunces,serif;font-size:24px;padding-top:4px"></div></div></div>
+      <div class="fld"><span>Total</span><div id="vpTotal" style="font-family:var(--fh);font-size:24px;padding-top:4px"></div></div></div>
     <label class="fld"><span>Cliente (opcional)</span><input id="vpCli" list="dlCliV" autocomplete="off"></label>
     <datalist id="dlCliV">${S.clientes.map(c => `<option value="${esc(c.nome)}">`).join('')}</datalist>
     <label class="fld"><span>Vendido por (opcional)</span><select id="vpVend"><option value="">—</option>${S.profs.filter(p => p.ativo !== false).map(p => `<option value="${p.id}">${esc(p.nome)}</option>`).join('')}</select></label>
@@ -1355,13 +1377,13 @@ function vAjustes() {
 }
 async function salvarCfg() {
   const ap = lerAparencia();
-  const d = { cor: ap.cor, tema: ap.tema, logoFundo: ap.logoFundo, slogan: ap.slogan, ...('logo' in rascunho ? { logo: rascunho.logo } : {}), nome: $('#cfNome').value.trim() || 'Meu Salão', whatsapp: $('#cfWa').value.trim(), endereco: $('#cfEnd').value.trim(), instagram: $('#cfIg').value.trim(), online: $('#cfOn').checked, intervalo: +$('#cfInt').value, antecedencia: +$('#cfAnt').value, diasFrente: Math.max(1, +$('#cfDias').value || 30), msgConfirmacao: $('#cfMC').value, msgLembrete: $('#cfML').value, msgAniversario: $('#cfMA').value, comissaoProduto: Math.min(100, Math.max(0, +$('#cfComProd').value || 0)) };
+  const d = { cor: ap.cor, tema: ap.tema, estilo: ap.estilo, logoFundo: ap.logoFundo, slogan: ap.slogan, ...('logo' in rascunho ? { logo: rascunho.logo } : {}), nome: $('#cfNome').value.trim() || 'Meu Salão', whatsapp: $('#cfWa').value.trim(), endereco: $('#cfEnd').value.trim(), instagram: $('#cfIg').value.trim(), online: $('#cfOn').checked, intervalo: +$('#cfInt').value, antecedencia: +$('#cfAnt').value, diasFrente: Math.max(1, +$('#cfDias').value || 30), msgConfirmacao: $('#cfMC').value, msgLembrete: $('#cfML').value, msgAniversario: $('#cfMA').value, comissaoProduto: Math.min(100, Math.max(0, +$('#cfComProd').value || 0)) };
   await F.setDoc(dref('config', 'salao'), d, { merge: true });
   S.cfgSujo = false; rascunho = {}; Object.assign(S.cfg, d); aplicarTema(S.cfg); render();
   toast('Ajustes salvos');
 }
 async function mostrarQR() {
-  openSheet(head('QR Code do agendamento', 'Imprima e deixe no balcão ou no espelho') + `<div class="qr" id="qrBox"><div class="spin"></div></div><p class="center" style="font-family:Fraunces,serif;font-size:20px;margin:4px 0">${esc(S.cfg.nome)}</p><p class="center muted small">Aponte a câmera para agendar seu horário</p><button class="btn full" data-act="baixarQR">Baixar imagem</button>`);
+  openSheet(head('QR Code do agendamento', 'Imprima e deixe no balcão ou no espelho') + `<div class="qr" id="qrBox"><div class="spin"></div></div><p class="center" style="font-family:var(--fh);font-size:20px;margin:4px 0">${esc(S.cfg.nome)}</p><p class="center muted small">Aponte a câmera para agendar seu horário</p><button class="btn full" data-act="baixarQR">Baixar imagem</button>`);
   try {
     if (!window.QRCode) await new Promise((ok, err) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js'; s.onload = ok; s.onerror = err; document.head.appendChild(s); });
     $('#qrBox').innerHTML = ''; new QRCode($('#qrBox'), { text: linkCliente(), width: 240, height: 240, colorDark: '#2a1f27', colorLight: '#ffffff' });
@@ -1380,6 +1402,10 @@ function vAparencia() {
         <button type="button" class="btn sm ghost danger" style="width:100%;margin-top:6px;${c.logo ? '' : 'display:none'}" data-act="tirarLogo">${ICON.trash}Remover</button></div></div>
       <label class="check"><input type="checkbox" id="cfLogoFundo" ${c.logoFundo === false ? '' : 'checked'}> Fundo branco atrás do logo</label>
     </div>
+    <div class="fld"><span>Estilo do salão</span>
+      <div class="radios ambs">${AMBIENTES.map(([k, t]) => `<label><input type="radio" name="cfAmb" value="${k}" ${estiloDe(c).amb === k ? 'checked' : ''}><span>${t}</span></label>`).join('')}</div>
+      <div class="estilos" id="cfEstilos">${cardsEstilo(estiloDe(c).amb, ESTILOS[c.estilo] ? c.estilo : 'padrao')}</div>
+      <p class="muted small" style="margin:6px 2px 0">Muda fontes, cantos e o topo do link. A cor sugerida é aplicada e pode ser trocada abaixo.</p></div>
     <div class="fld"><span>Cor principal</span>
       <div class="cores">${PALETAS.map(([n, h]) => `<label title="${n}"><input type="radio" name="cfCor" value="${h}" ${h === cor ? 'checked' : ''}><span style="background:${h}"></span></label>`).join('')}
         <label class="custom ${pre ? '' : 'on'}" title="Outra cor" style="${pre ? '' : `background:${esc(cor)};border-style:solid`}">+<input type="color" id="cfCorCustom" value="${esc(cor)}"></label></div>
@@ -1390,11 +1416,17 @@ function vAparencia() {
     <div class="fld" style="margin:0"><span>Prévia</span><div class="prev-hero" id="cfPrev"></div></div>
   </div>`;
 }
+function cardsEstilo(amb, sel) {
+  const l = Object.entries(ESTILOS).filter(([, e]) => e.amb === amb);
+  carregarFontes(l.flatMap(([, e]) => e.fontes));
+  return l.map(([k, e]) => `<label class="est"><input type="radio" name="cfEstilo" value="${k}" ${k === sel ? 'checked' : ''}><span class="c" style="border-radius:${Math.round(12 * e.rk)}px"><b style="font-family:${e.fh};font-weight:${e.hw};text-transform:${e.tt};letter-spacing:${e.ls}">${e.nome}</b><small style="font-family:${e.fb}">${e.desc}</small><i style="background:${e.cor}"></i></span></label>`).join('');
+}
 function lerAparencia() {
   const custom = $('#cfCorCustom');
   return {
     cor: document.querySelector('[name=cfCor]:checked')?.value || custom?.value || S.cfg.cor || '#7a2e63',
     tema: document.querySelector('[name=cfTema]:checked')?.value || '',
+    estilo: document.querySelector('[name=cfEstilo]:checked')?.value || S.cfg.estilo || 'padrao',
     logoFundo: $('#cfLogoFundo') ? $('#cfLogoFundo').checked : S.cfg.logoFundo !== false,
     slogan: $('#cfSlogan')?.value.trim() || '',
   };
@@ -1422,6 +1454,7 @@ async function prepararLogo(file) {
 /* ---------- exemplo ---------- */
 async function carregarExemplo() {
   if ((S.servicos.length || S.profs.length) && !confirm('Isso vai adicionar serviços, pacotes e profissionais de exemplo aos que já existem. Continuar?')) return;
+  if (estiloDe(S.cfg).amb === 'masculino') return exemploBarbearia();
   const serv = [
     ['Corte feminino', 'Cabelo', 90, 60], ['Corte masculino', 'Cabelo', 50, 30], ['Escova', 'Cabelo', 60, 45], ['Hidratação', 'Cabelo', 80, 45],
     ['Coloração', 'Cabelo', 190, 120], ['Mechas / luzes', 'Cabelo', 380, 210], ['Progressiva', 'Cabelo', 300, 180],
@@ -1442,6 +1475,26 @@ async function carregarExemplo() {
   b.set(F.doc(col('pacotes')), { nome: 'Tratamento capilar', itens: [{ servicoId: ids['Hidratação'], qtd: 4 }, { servicoId: ids['Escova'], qtd: 4 }], preco: 460, validadeDias: 60, descricao: 'Quatro hidratações com escova.', ativo: true });
   await b.commit();
   toast('Exemplo carregado. Ajuste preços e nomes em Cadastros');
+}
+
+async function exemploBarbearia() {
+  const serv = [
+    ['Corte masculino', 'Cabelo', 45, 30], ['Corte degradê', 'Cabelo', 50, 40], ['Corte + barba', 'Combos', 75, 60], ['Corte + barba + sobrancelha', 'Combos', 90, 75],
+    ['Barba', 'Barba', 35, 30], ['Barboterapia (toalha quente)', 'Barba', 50, 40], ['Pezinho', 'Acabamento', 15, 15], ['Sobrancelha', 'Acabamento', 20, 15],
+    ['Pigmentação', 'Tratamentos', 40, 30], ['Luzes / platinado', 'Tratamentos', 130, 120], ['Hidratação', 'Tratamentos', 40, 30],
+  ];
+  const b = F.writeBatch(db), ids = {};
+  serv.forEach(([nome, categoria, preco, duracao]) => { const r = F.doc(col('servicos')); ids[nome] = r.id; b.set(r, { nome, categoria, preco, duracao, descricao: '', ativo: true }); });
+  const h = HORARIO_PADRAO(); for (let d = 2; d <= 6; d++) h[d] = { ativo: true, ini: '09:00', fim: '20:00', pIni: '12:30', pFim: '13:30' }; h[6].fim = '18:00';
+  const p1 = F.doc(col('profissionais')), p2 = F.doc(col('profissionais'));
+  b.set(p1, { nome: 'Zé', especialidade: 'Barbeiro', cor: CORES[3], servicos: [], horarios: h, ativo: true });
+  b.set(p2, { nome: 'Léo', especialidade: 'Barbeiro', cor: CORES[1], servicos: [], horarios: h, ativo: true });
+  b.set(dref('privado', 'comissoes'), { [p1.id]: 50, [p2.id]: 50 }, { merge: true });
+  b.set(F.doc(col('pacotes')), { nome: 'Clube do corte (4 cortes)', itens: [{ servicoId: ids['Corte masculino'], qtd: 4 }], preco: 150, validadeDias: 35, descricao: 'Um corte por semana no mês.', ativo: true });
+  b.set(F.doc(col('pacotes')), { nome: 'Barba em dia (4 barbas)', itens: [{ servicoId: ids['Barba'], qtd: 4 }], preco: 115, validadeDias: 35, descricao: 'Quatro barbas no mês.', ativo: true });
+  b.set(F.doc(col('pacotes')), { nome: 'Combo completo mensal', itens: [{ servicoId: ids['Corte + barba'], qtd: 2 }, { servicoId: ids['Pezinho'], qtd: 2 }], preco: 150, validadeDias: 30, descricao: 'Dois cortes com barba e dois acabamentos.', ativo: true });
+  await b.commit();
+  toast('Exemplo de barbearia carregado. Ajuste em Cadastros');
 }
 
 /* ---------- ações ---------- */
@@ -1553,6 +1606,12 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', e => {
   if (e.target.id === 'cfLogo' && e.target.files[0]) { prepararLogo(e.target.files[0]).then(u => { rascunho.logo = u; S.cfgSujo = true; previewTema(); }).catch(() => toast('Não foi possível abrir essa imagem')); return; }
+  if (e.target.name === 'cfAmb') { const cur = document.querySelector('[name=cfEstilo]:checked')?.value; $('#cfEstilos').innerHTML = cardsEstilo(e.target.value, cur); S.cfgSujo = true; return; }
+  if (e.target.name === 'cfEstilo') {
+    const est = ESTILOS[e.target.value];
+    if (est) { const r = document.querySelector(`[name=cfCor][value="${est.cor}"]`); if (r) r.checked = true; else { document.querySelectorAll('[name=cfCor]').forEach(x => x.checked = false); $('#cfCorCustom').value = est.cor; } }
+    S.cfgSujo = true; previewTema(); return;
+  }
   if (e.target.closest && e.target.closest('#fCfg')) { S.cfgSujo = true; if (['cfCor', 'cfTema'].includes(e.target.name) || e.target.id === 'cfLogoFundo') previewTema(); }
   if (e.target.id === 'diaPick' && e.target.value) setDia(e.target.value);
   if (e.target.id === 'relDe' || e.target.id === 'relAte') { S.rel.de = $('#relDe').value; S.rel.ate = $('#relAte').value; if (S.rel.de && S.rel.ate) render(); }
@@ -1593,7 +1652,7 @@ function ouvirAgs() {
 /* aparência da tela de login: vem do ?s= do link ou do último salão usado neste aparelho */
 const SLUG = (new URLSearchParams(location.search).get('s') || '').trim();
 const CHAVE_AP = 'salaoAparencia';
-const CAMPOS_AP = ['nome', 'cor', 'logo', 'logoFundo', 'tema', 'slogan'];
+const CAMPOS_AP = ['nome', 'cor', 'logo', 'logoFundo', 'tema', 'slogan', 'estilo'];
 function lerAparenciaLocal() { try { const a = JSON.parse(localStorage.getItem(CHAVE_AP) || 'null'); return a && (!SLUG || a.sid === SLUG) ? a : null; } catch (e) { return null; } }
 function guardarAparencia(sid, cfg) { try { const a = { sid }; CAMPOS_AP.forEach(k => { if (cfg[k] !== undefined) a[k] = cfg[k]; }); localStorage.setItem(CHAVE_AP, JSON.stringify(a)); } catch (e) {} }
 let loginCfg = null;
@@ -1649,6 +1708,26 @@ async function init() {
 }
 
 /* ---------- PWA ---------- */
+/* ---------- estilos por ambiente ---------- */
+const ESTILOS = {
+  padrao:   { nome: 'Clássico', amb: 'unissex', desc: 'Elegante e neutro', cor: '#7a2e63', fh: "'Fraunces',Georgia,serif", fb: "'Inter',system-ui,sans-serif", hw: 600, rk: 1, pill: '999px', tt: 'none', ls: '-.01em', fontes: ['Fraunces:opsz,wght@9..144,600', 'Inter:wght@400;500;600;700'] },
+  delicado: { nome: 'Delicado', amb: 'feminino', desc: 'Traços finos e cantos bem arredondados', cor: '#c2577a', fh: "'Cormorant Garamond',Georgia,serif", fb: "'Nunito',system-ui,sans-serif", hw: 700, rk: 1.5, pill: '999px', tt: 'none', ls: '0', fontes: ['Cormorant+Garamond:wght@600;700', 'Nunito:wght@400;600;700'] },
+  glamour:  { nome: 'Glamour', amb: 'feminino', desc: 'Sofisticado, com toque dourado', cor: '#b08a3e', fh: "'Playfair Display',Georgia,serif", fb: "'Jost',system-ui,sans-serif", hw: 600, rk: 1, pill: '999px', tt: 'none', ls: '0', fontes: ['Playfair+Display:wght@600;700', 'Jost:wght@400;500;600'] },
+  natural:  { nome: 'Natural', amb: 'feminino', desc: 'Tons de terra, acolhedor', cor: '#9a6b4f', fh: "'Lora',Georgia,serif", fb: "'Nunito',system-ui,sans-serif", hw: 600, rk: 1.7, pill: '999px', tt: 'none', ls: '0', fontes: ['Lora:wght@600', 'Nunito:wght@400;600;700'] },
+  rustico:  { nome: 'Rústico', amb: 'masculino', desc: 'Madeira, couro e ferro', cor: '#7a4a2a', fh: "'Alfa Slab One',Georgia,serif", fb: "'Source Sans 3',system-ui,sans-serif", hw: 400, rk: .45, pill: '6px', tt: 'none', ls: '.01em', fontes: ['Alfa+Slab+One', 'Source+Sans+3:wght@400;600;700'] },
+  moderno:  { nome: 'Moderno', amb: 'masculino', desc: 'Minimalista, linhas retas', cor: '#2b2b30', fh: "'Bebas Neue',Impact,sans-serif", fb: "'Inter',system-ui,sans-serif", hw: 400, rk: .35, pill: '4px', tt: 'uppercase', ls: '.05em', fontes: ['Bebas+Neue', 'Inter:wght@400;500;600;700'] },
+  vintage:  { nome: 'Barbearia clássica', amb: 'masculino', desc: 'Tradicional, faixa de barber pole', cor: '#1f3a5f', fh: "'Oswald',Impact,sans-serif", fb: "'Source Sans 3',system-ui,sans-serif", hw: 600, rk: .6, pill: '6px', tt: 'uppercase', ls: '.03em', fontes: ['Oswald:wght@500;600', 'Source+Sans+3:wght@400;600;700'] },
+};
+const AMBIENTES = [['feminino', 'Feminino'], ['masculino', 'Masculino'], ['unissex', 'Unissex']];
+const fontesCarregadas = new Set(['Fraunces:opsz,wght@9..144,600', 'Inter:wght@400;500;600;700']);
+function carregarFontes(lista) {
+  const novas = lista.filter(f => !fontesCarregadas.has(f)); if (!novas.length) return;
+  novas.forEach(f => fontesCarregadas.add(f));
+  const l = document.createElement('link'); l.rel = 'stylesheet';
+  l.href = 'https://fonts.googleapis.com/css2?' + novas.map(f => 'family=' + f).join('&') + '&display=swap';
+  document.head.appendChild(l);
+}
+const estiloDe = cfg => ESTILOS[cfg && cfg.estilo] || ESTILOS.padrao;
 /* ---------- tema do salão (cor, logo, claro/escuro) ---------- */
 const PALETAS = [['Ameixa', '#7a2e63'], ['Rosé', '#c2577a'], ['Nude', '#b07a5e'], ['Terracota', '#b5523b'], ['Dourado', '#b08a3e'], ['Esmeralda', '#1f7a5c'], ['Petróleo', '#1f5f73'], ['Azul', '#2f5fb0'], ['Lilás', '#7b5cc4'], ['Grafite', '#3a3a40']];
 const hexRgb = h => { h = String(h || '#7a2e63').replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h, 16) || 0; return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
@@ -1660,7 +1739,7 @@ function paleta(hex) {
   const base = hexRgb(hex), W = [255, 255, 255], K = [0, 0, 0], BGL = [248, 244, 242], BGD = [31, 25, 34], ESC = [28, 17, 25];
   let l = base; for (let i = 0; i < 12 && contr(l, BGL) < 3.2; i++) l = mixC(l, K, .12);
   let d = base; for (let i = 0; i < 14 && contr(d, BGD) < 4.5; i++) d = mixC(d, W, .12);
-  const on = c => contr(c, W) >= contr(c, ESC) ? '#ffffff' : '#1c1119';
+  const on = c => contr(c, W) >= 2.9 ? '#ffffff' : '#1c1119';
   return { hero: rgbHex(base), heroOn: on(base), l: rgbHex(l), l2: rgbHex(mixC(l, W, .15)), lSoft: rgbHex(mixC(l, W, .88)), lOn: on(l), d: rgbHex(d), d2: rgbHex(mixC(d, W, .15)), dSoft: rgbHex(mixC(d, BGD, .78)), dOn: on(d) };
 }
 function aplicarTema(cfg = {}) {
@@ -1670,7 +1749,10 @@ function aplicarTema(cfg = {}) {
   const D = `--brand:${p.d};--brand2:${p.d2};--brand-soft:${p.dSoft};--on-brand:${p.dOn};${H}`;
   let st = document.getElementById('temaSalao');
   if (!st) { st = document.createElement('style'); st.id = 'temaSalao'; document.head.appendChild(st); }
-  st.textContent = `:root{${L}}@media (prefers-color-scheme:dark){:root:not([data-theme=light]){${D}}}:root[data-theme=dark]{${D}}`;
+  const e = estiloDe(cfg); carregarFontes(e.fontes);
+  const E = `--fh:${e.fh};--fb:${e.fb};--hw:${e.hw};--rk:${e.rk};--pill:${e.pill};--tt:${e.tt};--ls:${e.ls}`;
+  st.textContent = `:root{${L};${E}}@media (prefers-color-scheme:dark){:root:not([data-theme=light]){${D}}}:root[data-theme=dark]{${D}}`;
+  document.documentElement.dataset.estilo = (cfg && ESTILOS[cfg.estilo]) ? cfg.estilo : 'padrao';
   const de = document.documentElement;
   if (cfg.tema === 'clara') de.dataset.theme = 'light'; else if (cfg.tema === 'escura') de.dataset.theme = 'dark'; else delete de.dataset.theme;
   const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = p.hero;

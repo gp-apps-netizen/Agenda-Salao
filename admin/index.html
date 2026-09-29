@@ -38,7 +38,14 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .logo svg{width:22px;height:22px}
 .view{max-width:760px;margin:0 auto;padding:14px 16px calc(96px + env(safe-area-inset-bottom))}
 .bottom{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:space-around;background:var(--surface);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
-.bottom button{flex:1;max-width:120px;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;color:var(--muted);font-size:11px;font-weight:500;position:relative;border-radius:10px}
+.txt-bad{color:var(--bad)!important;font-weight:600}
+.cart{display:grid;grid-template-columns:1fr auto 76px 28px;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:6px}
+.cart-n{min-width:0}.cart-n b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cart-n small{font-size:12px}
+.cart-q{display:flex;align-items:center;gap:6px}.cart-q button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);font-weight:700}
+.cart-q span{min-width:18px;text-align:center;font-weight:600}
+.cart-p{width:100%;border:1px solid var(--line);border-radius:8px;padding:6px;background:var(--surface);text-align:right;font-size:14px}
+.cart-x{border:0;background:none;color:var(--bad);padding:0}.cart-x svg{width:18px;height:18px}
+.bottom button{flex:1;max-width:120px;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;color:var(--muted);font-size:10.5px;font-weight:500;position:relative;border-radius:10px;min-width:0}
 .bottom button.on{color:var(--brand)}
 .bottom button.on svg{stroke-width:2.2}
 .badge{position:absolute;top:2px;left:calc(50% + 6px);background:var(--bad);color:#fff;font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
@@ -210,7 +217,7 @@ table.t td.n,table.t th.n{text-align:right}
 <script type="module">
 import { firebaseConfig } from '../firebase-config.js';
 
-const VERSAO = '1.5';
+const VERSAO = '1.7';
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const configurado = !!(firebaseConfig && firebaseConfig.apiKey && !/COLE/i.test(firebaseConfig.apiKey));
 
@@ -265,6 +272,8 @@ const P = {
   undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
   share: '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>',
   copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+  bag: '<path d="M5 8h14l-1.2 13H6.2L5 8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>',
+  box: '<path d="M3 7.5l9-4 9 4v9l-9 4-9-4v-9z"/><path d="M3 7.5l9 4 9-4M12 11.5v9"/>',
   refresh: '<path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4"/>',
 };
 for (const k in P) ICON[k] = `<svg class="i" viewBox="0 0 24 24">${P[k]}</svg>`;
@@ -289,7 +298,7 @@ const S = {
   pronto: false, user: null, cfg: { ...CFG_PADRAO },
   servicos: [], profs: [], pacotes: [], comissoes: {}, clientes: [], cpacotes: [], ags: [],
   tab: 'agenda', dia: hoje(), filtroProf: 'todos', cadTab: 'servicos',
-  cliBusca: '', cliFiltro: 'todos',
+  cliBusca: '', cliFiltro: 'todos', produtos: [], vendas: [], prodBusca: '', prodFiltro: 'ativos',
   rel: { per: 'mes', de: '', ate: '' }, relDados: null, relCarregando: false,
   janela: null, erro: null,
 };
@@ -391,9 +400,9 @@ function vLogin() {
 }
 function vShell() {
   const pend = S.ags.filter(a => a.status === 'pendente').length;
-  const tabs = [['agenda', 'Agenda', 'cal', pend], ['clientes', 'Clientes', 'users'], ['caixa', 'Caixa', 'chart'], ['cadastros', 'Cadastros', 'tag'], ['ajustes', 'Ajustes', 'gear']];
-  const tit = { agenda: 'Agenda', clientes: 'Clientes', caixa: 'Caixa e relatórios', cadastros: 'Serviços, pacotes e equipe', ajustes: 'Ajustes' }[S.tab];
-  const views = { agenda: vAgenda, clientes: vClientes, caixa: vCaixa, cadastros: vCadastros, ajustes: vAjustes };
+  const tabs = [['agenda', 'Agenda', 'cal', pend], ['clientes', 'Clientes', 'users'], ['caixa', 'Caixa', 'chart'], ['produtos', 'Produtos', 'bag'], ['cadastros', 'Cadastros', 'tag'], ['ajustes', 'Ajustes', 'gear']];
+  const tit = { agenda: 'Agenda', clientes: 'Clientes', caixa: 'Caixa e relatórios', produtos: 'Produtos e estoque', cadastros: 'Serviços, pacotes e equipe', ajustes: 'Ajustes' }[S.tab];
+  const views = { agenda: vAgenda, clientes: vClientes, caixa: vCaixa, produtos: vProdutos, cadastros: vCadastros, ajustes: vAjustes };
   return `<header class="top"><div class="brand"><span class="logo ${logoClasse(S.cfg)}">${logoHtml(S.cfg, ICON.logo)}</span><div><b>${esc(S.cfg.nome)}</b><small>${tit}${S.suporte ? ' · suporte' : ''}</small></div></div>
     ${S.tab === 'agenda' && S.dia !== hoje() ? `<button class="icon-btn" data-act="irHoje">Hoje</button>` : ''}</header>
   <main class="view">${views[S.tab]()}</main>
@@ -460,7 +469,7 @@ function sheetAg(id) {
   let acoes = '';
   if (a.status === 'pendente') acoes = `<button class="btn pri" data-act="confirmar" data-id="${a.id}">${ICON.check}Confirmar</button><button class="btn danger" data-act="recusar" data-id="${a.id}">${ICON.x}Recusar</button>`;
   else if (a.status === 'confirmado') acoes = `<button class="btn pri full2" data-act="receber" data-id="${a.id}">${ICON.money}Concluir e receber</button><button class="btn" data-act="faltou" data-id="${a.id}">Faltou</button><button class="btn danger" data-act="cancelarAg" data-id="${a.id}">Cancelar</button>`;
-  else if (a.status === 'concluido') acoes = `<button class="btn full2" data-act="reabrir" data-id="${a.id}">${ICON.undo}Reabrir atendimento</button>`;
+  else if (a.status === 'concluido') acoes = `${S.produtos.some(p => p.ativo !== false) ? `<button class="btn soft full2" data-act="vendaCli" data-id="${a.id}">${ICON.bag}Vender produto para ${esc((a.clienteNome || '').split(' ')[0])}</button>` : ''}<button class="btn full2" data-act="reabrir" data-id="${a.id}">${ICON.undo}Reabrir atendimento</button>`;
   else acoes = `<button class="btn full2" data-act="reativar" data-id="${a.id}">${ICON.undo}Reativar horário</button>`;
   const wa = tel ? `<div class="btns" style="margin-top:8px">
       <a class="btn wa" target="_blank" rel="noopener" href="${waLink(tel, preencher(S.cfg.msgConfirmacao, a))}">${ICON.wa}Confirmação</a>
@@ -637,6 +646,8 @@ function sheetReceber(id) {
       <label class="fld"><span>Valor recebido (R$)</span><input id="rcValor" inputmode="decimal" value="${String(r2(valor)).replace('.', ',')}"></label>
       <div class="fld"><span>Forma de pagamento</span><div class="radios">${FORMAS.map((f, i) => `<label><input type="radio" name="rcForma" value="${f}" ${i === 0 ? 'checked' : ''}><span>${f}</span></label>`).join('')}</div></div>
     </div>
+    ${a.data !== hoje() ? `<label class="check" style="align-items:flex-start"><input type="checkbox" id="rcHoje" ${a.data > hoje() ? 'checked' : ''}><span>Atendido hoje<br><small class="muted">${a.data > hoje() ? `Estava marcado para ${fmtBR(a.data)}: o atendimento passa para hoje e o horário de ${fmtBR(a.data)} fica livre.` : `Estava marcado para ${fmtBR(a.data)}: move o atendimento para hoje.`}</small></span></label>` : ''}
+    <p class="muted small" style="margin:4px 2px 10px">O valor entra no caixa de hoje (${fmtBR(hoje())}).</p>
     <button class="btn pri full" style="margin-top:6px">${ICON.check}Concluir atendimento</button>
   </form>`, () => {
     document.querySelectorAll('[name=rcTipo]').forEach(r => r.addEventListener('change', () => { $('#rcAvulso').style.display = document.querySelector('[name=rcTipo]:checked').value ? 'none' : ''; }));
@@ -646,8 +657,11 @@ async function salvarReceber(form) {
   const id = form.dataset.id, a = agById(id);
   const cpId = document.querySelector('[name=rcTipo]:checked')?.value || '';
   const ref = dref('agendamentos', id);
+  const mover = !!$('#rcHoje')?.checked && a.data !== hoje();
+  const extra = { pagoEm: hoje(), ...(mover ? { data: hoje() } : {}) };
   form.querySelector('button.pri').disabled = true;
   try {
+    if (mover) await F.setDoc(dref('ocupados', id), { data: hoje(), profId: a.profId, ini: a.ini, fim: a.fim });
     if (cpId) {
       await F.runTransaction(db, async tx => {
         const r = dref('clientePacotes', cpId), snap = await tx.get(r);
@@ -657,15 +671,15 @@ async function salvarReceber(form) {
         it.usados++;
         const total = itens.reduce((s, i) => s + (+i.qtd || 0), 0) || 1;
         tx.update(r, { itens });
-        tx.update(ref, { status: 'concluido', valorCobrado: 0, formaPg: 'Pacote', pacoteClienteId: cpId, baseComissao: r2((+cp.valor || 0) / total), concluidoEm: F.serverTimestamp() });
+        tx.update(ref, { status: 'concluido', valorCobrado: 0, formaPg: 'Pacote', pacoteClienteId: cpId, baseComissao: r2((+cp.valor || 0) / total), concluidoEm: F.serverTimestamp(), ...extra });
       });
-      Object.assign(a, { status: 'concluido', valorCobrado: 0, formaPg: 'Pacote', pacoteClienteId: cpId });
+      Object.assign(a, { status: 'concluido', valorCobrado: 0, formaPg: 'Pacote', pacoteClienteId: cpId, ...extra });
     } else {
       const v = num($('#rcValor').value) ?? 0, f = document.querySelector('[name=rcForma]:checked')?.value || 'Pix';
-      await F.updateDoc(ref, { status: 'concluido', valorCobrado: v, formaPg: f, pacoteClienteId: '', baseComissao: v, concluidoEm: F.serverTimestamp() });
-      Object.assign(a, { status: 'concluido', valorCobrado: v, formaPg: f });
+      await F.updateDoc(ref, { status: 'concluido', valorCobrado: v, formaPg: f, pacoteClienteId: '', baseComissao: v, concluidoEm: F.serverTimestamp(), ...extra });
+      Object.assign(a, { status: 'concluido', valorCobrado: v, formaPg: f, ...extra });
     }
-    toast('Atendimento concluído'); sheetAg(id);
+    toast(mover ? 'Atendimento concluído e movido para hoje' : 'Atendimento concluído'); if (mover) { S.dia = hoje(); render(); } sheetAg(id);
   } catch (e) { console.error(e); toast(e.message || 'Erro ao concluir'); form.querySelector('button.pri').disabled = false; }
 }
 
@@ -798,31 +812,45 @@ async function carregarRel() {
   const [de, ate] = periodo();
   S.relCarregando = true; render();
   try {
-    const snap = await F.getDocs(F.query(col('agendamentos'), F.where('data', '>=', de), F.where('data', '<=', ate)));
-    S.relDados = { de, ate, ags: snap.docs.map(d => ({ id: d.id, ...d.data() })) };
-  } catch (e) { console.error(e); toast('Erro ao carregar relatório'); S.relDados = { de, ate, ags: [] }; }
+    const faixa = (c, campo) => F.getDocs(F.query(col(c), F.where(campo, '>=', de), F.where(campo, '<=', ate)));
+    const [s1, s2, s3, s4] = await Promise.all([faixa('agendamentos', 'data'), faixa('agendamentos', 'pagoEm'), faixa('vendas', 'data'), faixa('movimentos', 'data')]);
+    const m = new Map(); [...s1.docs, ...s2.docs].forEach(d => m.set(d.id, { id: d.id, ...d.data() }));
+    const lst = sn => sn.docs.map(d => ({ id: d.id, ...d.data() }));
+    S.relDados = { de, ate, ags: [...m.values()], vprod: lst(s3), movs: lst(s4) };
+  } catch (e) { console.error(e); toast('Erro ao carregar relatório'); S.relDados = { de, ate, ags: [], vprod: [], movs: [] }; }
   S.relCarregando = false; render();
 }
 function calcRel() {
-  const { de, ate, ags } = S.relDados;
-  const at = ags.filter(a => a.tipo !== 'bloqueio');
-  const conc = at.filter(a => a.status === 'concluido');
+  const { de, ate, ags } = S.relDados, vprod = S.relDados.vprod || [], movs = S.relDados.movs || [];
+  const noPer = x => x >= de && x <= ate;
+  const todos = ags.filter(a => a.tipo !== 'bloqueio');
+  const at = todos.filter(a => noPer(a.data));                       // agenda do período (faltas, cancelados, pedidos)
+  const conc = todos.filter(a => a.status === 'concluido' && noPer(a.pagoEm || a.data));   // caixa: pelo dia do pagamento
   const vendas = S.cpacotes.filter(cp => cp.data >= de && cp.data <= ate);
   const recServ = conc.reduce((s, a) => s + (+a.valorCobrado || 0), 0);
   const recPac = vendas.reduce((s, cp) => s + (+cp.valor || 0), 0);
   const formas = {};
   conc.filter(a => a.formaPg !== 'Pacote').forEach(a => formas[a.formaPg || 'Outro'] = (formas[a.formaPg || 'Outro'] || 0) + (+a.valorCobrado || 0));
   vendas.forEach(cp => formas[cp.formaPg || 'Outro'] = (formas[cp.formaPg || 'Outro'] || 0) + (+cp.valor || 0));
+  vprod.forEach(v => formas[v.formaPg || 'Outro'] = (formas[v.formaPg || 'Outro'] || 0) + (+v.total || 0));
+  const recProd = vprod.reduce((s, v) => s + (+v.total || 0), 0), custoProd = vprod.reduce((s, v) => s + (+v.custoTotal || 0), 0);
+  const compras = movs.filter(m => m.tipo === 'entrada' && !m.inicial).reduce((s, m) => s + (+m.qtd || 0) * (+m.custoUnit || 0), 0);
+  const perdas = movs.filter(m => m.tipo === 'ajuste' && m.qtd < 0).reduce((s, m) => s - (+m.qtd || 0) * (+m.custoUnit || 0), 0);
+  const tops = {};
+  vprod.forEach(v => v.itens.forEach(i => { const o = tops[i.nome] || (tops[i.nome] = { n: 0, v: 0 }); o.n += i.qtd; o.v += i.qtd * i.preco; }));
+  const pctProd = +S.cfg.comissaoProduto || 0;
   const profs = {};
   conc.forEach(a => {
     const k = a.profId || '?', o = profs[k] || (profs[k] = { nome: nomeProf(a), n: 0, fat: 0, base: 0 });
     o.n++; o.fat += +a.valorCobrado || 0; o.base += a.baseComissao != null ? +a.baseComissao || 0 : +a.valorCobrado || 0;
   });
-  Object.entries(profs).forEach(([k, o]) => { o.pct = +S.comissoes[k] || 0; o.com = r2(o.base * o.pct / 100); });
+  vprod.filter(v => v.vendedorId).forEach(v => { const o = profs[v.vendedorId] || (profs[v.vendedorId] = { nome: profById(v.vendedorId)?.nome || v.vendedorNome, n: 0, fat: 0, base: 0 }); o.prod = (o.prod || 0) + (+v.total || 0); });
+  Object.entries(profs).forEach(([k, o]) => { o.pct = +S.comissoes[k] || 0; o.comServ = r2(o.base * o.pct / 100); o.comProd = r2((o.prod || 0) * pctProd / 100); o.com = r2(o.comServ + o.comProd); });
   const servs = {};
   conc.forEach(a => { const o = servs[a.servicoNome] || (servs[a.servicoNome] = { n: 0, v: 0 }); o.n++; o.v += +a.valorCobrado || 0; });
   return {
-    de, ate, recServ, recPac, total: recServ + recPac, nConc: conc.length,
+    de, ate, recServ, recPac, recProd, custoProd, lucroProd: recProd - custoProd, compras, perdas, pctProd, total: recServ + recPac + recProd, nConc: conc.length, nVendasProd: vprod.length,
+    topProd: Object.entries(tops).sort((a, b) => b[1].n - a[1].n),
     ticket: (n => n ? recServ / n : 0)(conc.filter(a => a.formaPg !== 'Pacote').length),
     faltas: at.filter(a => a.status === 'faltou').length, cancel: at.filter(a => a.status === 'cancelado').length,
     online: at.filter(a => a.origem === 'online').length, sessoesPac: conc.filter(a => a.formaPg === 'Pacote').length,
@@ -846,6 +874,7 @@ function vCaixa() {
       <div class="kpi big"><small>Faturamento no período</small><b>${brl(R.total)}</b></div>
       <div class="kpi"><small>Serviços</small><b>${brl(R.recServ)}</b></div>
       <div class="kpi"><small>Pacotes vendidos</small><b>${brl(R.recPac)}</b></div>
+      <div class="kpi"><small>Produtos</small><b>${brl(R.recProd)}</b></div>
       <div class="kpi"><small>Atendimentos</small><b>${R.nConc}</b></div>
       <div class="kpi"><small>Ticket médio</small><b>${brl(R.ticket)}</b></div>
       <div class="kpi"><small>Faltas / cancelados</small><b>${R.faltas} / ${R.cancel}</b></div>
@@ -854,10 +883,19 @@ function vCaixa() {
     <div class="sec-t"><h3>Por forma de pagamento</h3></div>
     <div class="card bars">${R.formas.length ? R.formas.map(([f, v]) => `<div class="b"><div><span>${esc(f)}</span><span>${brl(v)}</span></div><div class="track"><i style="width:${v / maxF * 100}%"></i></div></div>`).join('') : '<p class="muted small" style="margin:0">Nenhum recebimento no período.</p>'}
       ${R.sessoesPac ? `<p class="muted small" style="margin:6px 0 0">${R.sessoesPac} atendimento${R.sessoesPac > 1 ? 's' : ''} pago${R.sessoesPac > 1 ? 's' : ''} com sessão de pacote.</p>` : ''}</div>
+    ${R.nVendasProd || R.compras || R.perdas ? `<div class="sec-t"><h3>Produtos</h3><span class="muted small">${R.nVendasProd} venda${R.nVendasProd === 1 ? '' : 's'}</span></div>
+    <div class="card"><dl class="kv" style="border:0;padding:0;margin:0;background:none">
+      <dt>Vendido</dt><dd>${brl(R.recProd)}</dd>
+      <dt>Custo dos produtos vendidos</dt><dd>− ${brl(R.custoProd)}</dd>
+      <dt><b>Lucro em produtos</b></dt><dd><b>${brl(R.lucroProd)}</b>${R.recProd ? ` <small class="muted">(${Math.round(R.lucroProd / R.recProd * 100)}%)</small>` : ''}</dd>
+      <dt>Compras de estoque</dt><dd>${brl(R.compras)}</dd>
+      ${R.perdas ? `<dt>Uso interno e perdas</dt><dd>${brl(R.perdas)}</dd>` : ''}
+    </dl>
+    ${R.topProd.length ? `<div class="bars" style="margin-top:12px">${R.topProd.slice(0, 5).map(([n, o]) => `<div class="b"><div><span>${esc(n)}</span><span>${o.n} un · ${brl(o.v)}</span></div><div class="track"><i style="width:${o.n / Math.max(1, R.topProd[0][1].n) * 100}%"></i></div></div>`).join('')}</div>` : ''}</div>` : ''}
     <div class="sec-t"><h3>Comissões</h3><span class="muted small">Total ${brl(totCom)}</span></div>
     <div class="card"><table class="t"><thead><tr><th>Profissional</th><th class="n">Atend.</th><th class="n">Faturado</th><th class="n">Comissão</th></tr></thead><tbody>
-      ${R.profs.length ? R.profs.map(p => `<tr><td>${esc(p.nome)}</td><td class="n">${p.n}</td><td class="n">${brl(p.fat)}</td><td class="n"><b>${brl(p.com)}</b><br><small class="muted">${p.pct}%</small></td></tr>`).join('') : '<tr><td colspan="4" class="muted">Sem atendimentos concluídos.</td></tr>'}
-    </tbody></table><p class="muted small" style="margin:8px 0 0">Sessões de pacote entram na comissão pelo valor proporcional da sessão.</p></div>
+      ${R.profs.length ? R.profs.map(p => `<tr><td>${esc(p.nome)}</td><td class="n">${p.n}</td><td class="n">${brl(p.fat)}</td><td class="n"><b>${brl(p.com)}</b><br><small class="muted">${p.pct}%${p.comProd ? ` · ${brl(p.comProd)} prod.` : ''}</small></td></tr>`).join('') : '<tr><td colspan="4" class="muted">Sem atendimentos concluídos.</td></tr>'}
+    </tbody></table><p class="muted small" style="margin:8px 0 0">Sessões de pacote entram na comissão pelo valor proporcional da sessão.${R.pctProd ? ` Venda de produtos: ${R.pctProd}% para quem vendeu.` : ''}</p></div>
     <div class="sec-t"><h3>Serviços mais feitos</h3></div>
     <div class="card bars">${R.servs.length ? R.servs.slice(0, 8).map(([n, o]) => `<div class="b"><div><span>${esc(n)}</span><span>${o.n}× · ${brl(o.v)}</span></div><div class="track"><i style="width:${o.n / maxS * 100}%"></i></div></div>`).join('') : '<p class="muted small" style="margin:0">Nada por aqui ainda.</p>'}</div>
     ${R.vendas.length ? `<div class="sec-t"><h3>Pacotes vendidos</h3></div>${R.vendas.map(cp => `<div class="row" style="cursor:default"><span class="grow"><b>${esc(cp.pacoteNome)}</b><span>${esc(cp.clienteNome)} · ${fmtBR(cp.data)}</span></span><span class="r">${brl(cp.valor)}<small>${esc(cp.formaPg)}</small></span></div>`).join('')}` : ''}
@@ -872,7 +910,7 @@ function vCaixa() {
 function textoResumo() {
   const R = calcRel();
   let t = `*${S.cfg.nome}* — resumo ${fmtBR(R.de)}${R.de !== R.ate ? ' a ' + fmtBR(R.ate) : ''}\n\n`;
-  t += `Faturamento: ${brl(R.total)}\n• Serviços: ${brl(R.recServ)}\n• Pacotes: ${brl(R.recPac)}\nAtendimentos: ${R.nConc} · Ticket médio: ${brl(R.ticket)}\nFaltas: ${R.faltas}\n`;
+  t += `Faturamento: ${brl(R.total)}\n• Serviços: ${brl(R.recServ)}\n• Pacotes: ${brl(R.recPac)}\n• Produtos: ${brl(R.recProd)} (lucro ${brl(R.lucroProd)})\nAtendimentos: ${R.nConc} · Ticket médio: ${brl(R.ticket)}\nFaltas: ${R.faltas}\n`;
   if (R.formas.length) t += `\n*Recebimentos*\n` + R.formas.map(([f, v]) => `• ${f}: ${brl(v)}`).join('\n') + '\n';
   if (R.profs.length) t += `\n*Comissões*\n` + R.profs.map(p => `• ${p.nome}: ${p.n} atend. · ${brl(p.com)}`).join('\n');
   return t;
@@ -1004,6 +1042,271 @@ async function salvarProf(form) {
   await b.commit(); closeSheet(); toast('Profissional salva');
 }
 
+/* ---------- PRODUTOS ---------- */
+const prodById = id => S.produtos.find(p => p.id === id);
+const margemP = (preco, custo) => (+preco > 0) ? ((+preco - (+custo || 0)) / +preco * 100) : 0;
+const baixoP = p => p.ativo !== false && (+p.estoque || 0) <= (+p.estoqueMin || 0);
+const agoraHM = () => { const n = new Date(); return `${pad(n.getHours())}:${pad(n.getMinutes())}`; };
+const MOTIVOS = { uso: 'Uso no salão', perda: 'Perda ou avaria', contagem: 'Contagem de estoque' };
+function vProdutos() {
+  const q = norm(S.prodBusca), f = S.prodFiltro;
+  const at = S.produtos.filter(p => p.ativo !== false);
+  let l = f === 'baixo' ? at.filter(baixoP) : f === 'inativos' ? S.produtos.filter(p => p.ativo === false) : at;
+  if (q) l = l.filter(p => norm(`${p.nome} ${p.marca || ''} ${p.categoria || ''}`).includes(q));
+  const un = at.reduce((s, p) => s + Math.max(0, +p.estoque || 0), 0);
+  const vCusto = at.reduce((s, p) => s + Math.max(0, +p.estoque || 0) * (+p.custo || 0), 0);
+  const vVenda = at.reduce((s, p) => s + Math.max(0, +p.estoque || 0) * (+p.preco || 0), 0);
+  const nBaixo = at.filter(baixoP).length, nInat = S.produtos.length - at.length;
+  const hojeV = S.vendas.filter(v => v.data === hoje()).reduce((s, v) => s + (+v.total || 0), 0);
+  const rec = S.vendas.slice().sort((a, b) => ((b.data || '') + (b.hora || '')).localeCompare((a.data || '') + (a.hora || ''))).slice(0, 8);
+  return `
+  <div class="btns" style="margin-bottom:12px"><button class="btn pri" data-act="novaVenda">${ICON.bag}Nova venda</button><button class="btn" data-act="entrada">${ICON.box}Entrada</button></div>
+  <div class="kpis">
+    <div class="kpi"><small>Vendido hoje</small><b>${brl(hojeV)}</b></div>
+    <div class="kpi"><small>Unidades em estoque</small><b>${un}</b></div>
+    <div class="kpi"><small>Estoque (preço de custo)</small><b>${brl(vCusto)}</b></div>
+    <div class="kpi"><small>Lucro se vender tudo</small><b>${brl(vVenda - vCusto)}</b></div>
+  </div>
+  ${nBaixo && f !== 'baixo' ? `<button class="banner" style="margin-top:12px" data-act="prodFiltro" data-f="baixo">${ICON.box}<span><b>${nBaixo} produto${nBaixo > 1 ? 's' : ''}</b> com estoque baixo</span></button>` : ''}
+  <div class="search" style="margin-top:12px">${ICON.search}<input id="prodBusca" placeholder="Buscar produto, marca ou categoria" value="${esc(S.prodBusca)}" data-in="prodBusca"></div>
+  <div class="chips">
+    <button class="chip ${f === 'ativos' ? 'on' : ''}" data-act="prodFiltro" data-f="ativos">À venda · ${at.length}</button>
+    <button class="chip ${f === 'baixo' ? 'on' : ''}" data-act="prodFiltro" data-f="baixo">Estoque baixo · ${nBaixo}</button>
+    ${nInat ? `<button class="chip ${f === 'inativos' ? 'on' : ''}" data-act="prodFiltro" data-f="inativos">Inativos · ${nInat}</button>` : ''}
+  </div>
+  ${l.length ? l.map(p => `<button class="row ${p.ativo === false ? 'inativo' : ''}" data-act="verProd" data-id="${p.id}"><span class="av">${ICON.bag}</span><span class="grow"><b>${esc(p.nome)}</b><span>${esc([p.marca, p.categoria].filter(Boolean).join(' · ') || 'Sem marca')} · margem ${Math.round(margemP(p.preco, p.custo))}%</span></span><span class="r">${brl(p.preco)}<small class="${baixoP(p) ? 'txt-bad' : ''}">${+p.estoque || 0} em estoque</small></span></button>`).join('')
+    : `<div class="empty">${ICON.bag}<div>${S.produtos.length ? 'Nenhum produto neste filtro.' : 'Cadastre os produtos que o salão vende, com custo, preço e estoque.'}</div></div>`}
+  ${rec.length ? `<div class="sec-t"><h3>Vendas recentes</h3></div>${rec.map(v => `<button class="row" data-act="verVenda" data-id="${v.id}"><span class="grow"><b>${esc(v.itens.map(i => `${i.qtd}× ${i.nome}`).join(', '))}</b><span>${fmtBR(v.data)} ${v.hora || ''}${v.clienteNome ? ' · ' + esc(v.clienteNome) : ''}</span></span><span class="r">${brl(v.total)}<small>${esc(v.formaPg)}</small></span></button>`).join('')}` : ''}
+  <button class="fab" data-act="novoProd" aria-label="Novo produto">${ICON.plus}</button>`;
+}
+function sheetProd(id) {
+  const p = prodById(id); if (!p) return closeSheet();
+  const lucro = (+p.preco || 0) - (+p.custo || 0);
+  openSheet(head(esc(p.nome), esc([p.marca, p.categoria].filter(Boolean).join(' · '))) + `
+    <dl class="kv">
+      <dt>Preço de venda</dt><dd>${brl(p.preco)}</dd>
+      <dt>Custo médio</dt><dd>${brl(p.custo)}</dd>
+      <dt>Lucro por unidade</dt><dd>${brl(lucro)} · ${Math.round(margemP(p.preco, p.custo))}%</dd>
+      <dt>Em estoque</dt><dd class="${baixoP(p) ? 'txt-bad' : ''}">${+p.estoque || 0} un · mínimo ${+p.estoqueMin || 0}</dd>
+      <dt>Valor em estoque</dt><dd>${brl(Math.max(0, +p.estoque || 0) * (+p.custo || 0))}</dd>
+    </dl>
+    <div class="btns">
+      <button class="btn pri" data-act="novaVenda" data-prod="${id}">${ICON.bag}Vender</button>
+      <button class="btn" data-act="entrada" data-prod="${id}">${ICON.box}Entrada</button>
+      <button class="btn" data-act="ajuste" data-id="${id}">Ajustar estoque</button>
+      <button class="btn" data-act="editProd" data-id="${id}">${ICON.edit}Editar</button>
+    </div>
+    <div class="sec-t"><h3>Movimentações</h3></div><div id="movs"><div class="spin" style="margin:16px auto"></div></div>`, async () => {
+    try {
+      const snap = await F.getDocs(F.query(col('movimentos'), F.where('produtoId', '==', id)));
+      const l = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => ((b.data || '') + (b.hora || '')).localeCompare((a.data || '') + (a.hora || '')));
+      const nomes = { entrada: 'Entrada', venda: 'Venda', ajuste: 'Ajuste', estorno: 'Venda cancelada' };
+      const el = $('#movs'); if (!el) return;
+      el.innerHTML = l.length ? l.slice(0, 30).map(m => `<div class="row" style="cursor:default"><span class="grow"><b>${nomes[m.tipo] || m.tipo}${m.inicial ? ' (estoque inicial)' : ''}</b><span>${fmtBR(m.data)} ${m.hora || ''}${m.obs ? ' · ' + esc(m.obs) : ''}</span></span><span class="r" style="color:${m.qtd > 0 ? 'var(--ok)' : 'var(--bad)'}">${m.qtd > 0 ? '+' : ''}${m.qtd}<small>${m.custoUnit != null ? brl(m.custoUnit) + '/un' : ''}</small></span></div>`).join('') : '<p class="muted small">Nenhuma movimentação ainda.</p>';
+    } catch (e) { const el = $('#movs'); if (el) el.innerHTML = '<p class="muted small">Não foi possível carregar.</p>'; }
+  });
+}
+function formProd(id) {
+  const p = id ? prodById(id) : { nome: '', marca: '', categoria: '', custo: '', preco: '', estoque: 0, estoqueMin: 2, ativo: true };
+  const cats = [...new Set(S.produtos.map(x => x.categoria).filter(Boolean))];
+  openSheet(head(id ? 'Editar produto' : 'Novo produto') + `
+  <form id="fProd" data-id="${id || ''}">
+    <label class="fld"><span>Nome</span><input id="prNome" required placeholder="Ex.: Shampoo hidratante 300ml"></label>
+    <div class="grid2"><label class="fld"><span>Marca</span><input id="prMarca"></label>
+      <label class="fld"><span>Categoria</span><input id="prCat" list="dlPCat" placeholder="Ex.: Cabelo"></label></div>
+    <datalist id="dlPCat">${cats.map(c => `<option value="${esc(c)}">`).join('')}</datalist>
+    <div class="grid2"><label class="fld"><span>Custo (R$)</span><input id="prCusto" inputmode="decimal"></label>
+      <label class="fld"><span>Preço de venda (R$)</span><input id="prPreco" inputmode="decimal" required></label></div>
+    <p class="muted small" id="prCalc" style="margin:-4px 2px 12px"></p>
+    <div class="grid2">${id ? '' : `<label class="fld"><span>Estoque inicial</span><input id="prEst" type="number" min="0" value="0"></label>`}
+      <label class="fld"><span>Estoque mínimo</span><input id="prMin" type="number" min="0"></label></div>
+    ${id ? `<p class="muted small" style="margin:-4px 2px 12px">Para mudar a quantidade em estoque use Entrada ou Ajustar estoque.</p>` : ''}
+    <label class="check"><input type="checkbox" id="prAtivo"> À venda</label>
+    <button class="btn pri full">${ICON.check}Salvar</button>
+    ${id ? `<button type="button" class="btn ghost danger full" data-act="excluirProd" data-id="${id}" style="margin-top:6px">${ICON.trash}Excluir produto</button>` : ''}
+  </form>`, () => {
+    $('#prNome').value = p.nome || ''; $('#prMarca').value = p.marca || ''; $('#prCat').value = p.categoria || '';
+    $('#prCusto').value = p.custo !== '' && p.custo != null ? (+p.custo).toFixed(2).replace('.', ',') : '';
+    $('#prPreco').value = p.preco !== '' && p.preco != null ? (+p.preco).toFixed(2).replace('.', ',') : '';
+    $('#prMin').value = +p.estoqueMin || 0; $('#prAtivo').checked = p.ativo !== false;
+    const calc = () => { const c = num($('#prCusto').value) || 0, v = num($('#prPreco').value) || 0; $('#prCalc').textContent = v ? `Lucro por unidade ${brl(v - c)} · margem ${Math.round(margemP(v, c))}%${c ? ` · preço = custo × ${(v / c).toFixed(2).replace('.', ',')}` : ''}` : ''; };
+    $('#prCusto').addEventListener('input', calc); $('#prPreco').addEventListener('input', calc); calc();
+  });
+}
+async function salvarProd(form) {
+  const id = form.dataset.id;
+  const d = { nome: $('#prNome').value.trim(), marca: $('#prMarca').value.trim(), categoria: $('#prCat').value.trim(), custo: num($('#prCusto').value) ?? 0, preco: num($('#prPreco').value) ?? 0, estoqueMin: Math.max(0, +$('#prMin').value || 0), ativo: $('#prAtivo').checked };
+  if (!d.nome) return toast('Informe o nome');
+  if (id) { await F.updateDoc(dref('produtos', id), d); closeSheet(); toast('Produto salvo'); return; }
+  const est = Math.max(0, Math.floor(+$('#prEst').value || 0));
+  const ref = F.doc(col('produtos')), b = F.writeBatch(db);
+  b.set(ref, { ...d, estoque: est, criadoEm: F.serverTimestamp() });
+  if (est) b.set(F.doc(col('movimentos')), { tipo: 'entrada', inicial: true, produtoId: ref.id, produtoNome: d.nome, qtd: est, custoUnit: d.custo, data: hoje(), hora: agoraHM(), obs: '' });
+  await b.commit(); closeSheet(); toast('Produto cadastrado');
+}
+function optsProd(sel, soAtivos = true) {
+  return `<option value="">Escolha o produto…</option>` + S.produtos.filter(p => !soAtivos || p.ativo !== false || p.id === sel).map(p => `<option value="${p.id}" ${p.id === sel ? 'selected' : ''}>${esc(p.nome)}${p.marca ? ' · ' + esc(p.marca) : ''} (${+p.estoque || 0} un)</option>`).join('');
+}
+function formEntrada(pid = '') {
+  if (!S.produtos.length) return toast('Cadastre um produto primeiro');
+  openSheet(head('Entrada de estoque', 'Compra ou reposição de produtos') + `
+  <form id="fEntrada">
+    <label class="fld"><span>Produto</span><select id="enProd" required>${optsProd(pid, false)}</select></label>
+    <div class="grid2"><label class="fld"><span>Quantidade</span><input id="enQtd" type="number" min="1" value="1" required></label>
+      <label class="fld"><span>Custo por unidade (R$)</span><input id="enCusto" inputmode="decimal"></label></div>
+    <p class="muted small" id="enCalc" style="margin:-4px 2px 12px"></p>
+    <label class="fld"><span>Fornecedor ou nota (opcional)</span><input id="enObs"></label>
+    <button class="btn pri full">${ICON.box}Registrar entrada</button>
+  </form>`, () => {
+    const upd = () => { const p = prodById($('#enProd').value); if (p && !$('#enCusto').dataset.mexeu) $('#enCusto').value = (+p.custo || 0).toFixed(2).replace('.', ','); calc(); };
+    const calc = () => {
+      const p = prodById($('#enProd').value), q = Math.max(0, +$('#enQtd').value || 0), c = num($('#enCusto').value) || 0;
+      if (!p || !q) { $('#enCalc').textContent = ''; return; }
+      const e = Math.max(0, +p.estoque || 0), med = e ? (e * (+p.custo || 0) + q * c) / (e + q) : c;
+      $('#enCalc').textContent = `Total da compra ${brl(q * c)} · estoque passa para ${e + q} un · custo médio ${brl(med)}`;
+    };
+    $('#enProd').addEventListener('change', () => { delete $('#enCusto').dataset.mexeu; upd(); });
+    $('#enCusto').addEventListener('input', () => { $('#enCusto').dataset.mexeu = 1; calc(); });
+    $('#enQtd').addEventListener('input', calc); upd();
+  });
+}
+async function salvarEntrada() {
+  const pid = $('#enProd').value, q = Math.floor(+$('#enQtd').value || 0), c = num($('#enCusto').value) ?? 0;
+  if (!pid || q <= 0) return toast('Escolha o produto e a quantidade');
+  const obs = $('#enObs').value.trim();
+  await F.runTransaction(db, async tx => {
+    const r = dref('produtos', pid), s = await tx.get(r); const p = s.data();
+    const e = +p.estoque || 0, base = Math.max(0, e), med = base ? (base * (+p.custo || 0) + q * c) / (base + q) : c;
+    tx.update(r, { estoque: e + q, custo: r2(med) });
+    tx.set(F.doc(col('movimentos')), { tipo: 'entrada', produtoId: pid, produtoNome: p.nome, qtd: q, custoUnit: c, data: hoje(), hora: agoraHM(), obs });
+  });
+  toast('Entrada registrada'); setTimeout(() => sheetProd(pid), 150);
+}
+function formAjuste(pid) {
+  const p = prodById(pid);
+  openSheet(head('Ajustar estoque', `${esc(p.nome)} · ${+p.estoque || 0} em estoque`) + `
+  <form id="fAjuste" data-id="${pid}">
+    <div class="fld"><span>Motivo</span><div class="radios">${Object.entries(MOTIVOS).map(([k, t], i) => `<label><input type="radio" name="ajMot" value="${k}" ${i === 0 ? 'checked' : ''}><span>${t}</span></label>`).join('')}</div></div>
+    <label class="fld"><span id="ajLbl">Quantidade retirada</span><input id="ajQtd" type="number" min="0" value="1" required></label>
+    <label class="fld"><span>Observação (opcional)</span><input id="ajObs"></label>
+    <button class="btn pri full">${ICON.check}Salvar ajuste</button>
+  </form>`, () => {
+    document.querySelectorAll('[name=ajMot]').forEach(r => r.addEventListener('change', () => {
+      const cont = document.querySelector('[name=ajMot]:checked').value === 'contagem';
+      $('#ajLbl').textContent = cont ? 'Quantidade contada na prateleira' : 'Quantidade retirada';
+      $('#ajQtd').value = cont ? (+prodById(pid).estoque || 0) : 1;
+    }));
+  });
+}
+async function salvarAjuste(form) {
+  const pid = form.dataset.id, mot = document.querySelector('[name=ajMot]:checked').value, v = Math.max(0, Math.floor(+$('#ajQtd').value || 0)), obs = $('#ajObs').value.trim();
+  await F.runTransaction(db, async tx => {
+    const r = dref('produtos', pid), s = await tx.get(r); const p = s.data(), e = +p.estoque || 0;
+    const delta = mot === 'contagem' ? v - e : -v;
+    if (!delta) return;
+    tx.update(r, { estoque: e + delta });
+    tx.set(F.doc(col('movimentos')), { tipo: 'ajuste', motivo: mot, produtoId: pid, produtoNome: p.nome, qtd: delta, custoUnit: +p.custo || 0, data: hoje(), hora: agoraHM(), obs: [MOTIVOS[mot], obs].filter(Boolean).join(' · ') });
+  });
+  toast('Estoque ajustado'); setTimeout(() => sheetProd(pid), 150);
+}
+let carrinho = [];
+function formVendaProd(preset = {}) {
+  const ativos = S.produtos.filter(p => p.ativo !== false);
+  if (!ativos.length) return toast('Cadastre um produto primeiro');
+  carrinho = [];
+  if (preset.prod) carrinho.push({ produtoId: preset.prod, qtd: 1, preco: +prodById(preset.prod)?.preco || 0 });
+  openSheet(head('Nova venda', 'Produtos') + `
+  <form id="fVendaProd">
+    <label class="fld"><span>Adicionar produto</span><select id="vpAdd">${optsProd('')}</select></label>
+    <div id="vpItens"></div>
+    <div class="grid2"><label class="fld"><span>Desconto (R$)</span><input id="vpDesc" inputmode="decimal" placeholder="0,00"></label>
+      <div class="fld"><span>Total</span><div id="vpTotal" style="font-family:Fraunces,serif;font-size:24px;padding-top:4px"></div></div></div>
+    <label class="fld"><span>Cliente (opcional)</span><input id="vpCli" list="dlCliV" autocomplete="off"></label>
+    <datalist id="dlCliV">${S.clientes.map(c => `<option value="${esc(c.nome)}">`).join('')}</datalist>
+    <label class="fld"><span>Vendido por (opcional)</span><select id="vpVend"><option value="">—</option>${S.profs.filter(p => p.ativo !== false).map(p => `<option value="${p.id}">${esc(p.nome)}</option>`).join('')}</select></label>
+    <div class="fld"><span>Forma de pagamento</span><div class="radios">${FORMAS.map((f, i) => `<label><input type="radio" name="vpForma" value="${f}" ${i === 0 ? 'checked' : ''}><span>${f}</span></label>`).join('')}</div></div>
+    <button class="btn pri full">${ICON.check}Registrar venda</button>
+  </form>`, () => {
+    if (preset.clienteNome) $('#vpCli').value = preset.clienteNome;
+    desenharCarrinho();
+    $('#vpAdd').addEventListener('change', e => {
+      const p = prodById(e.target.value); if (!p) return;
+      const it = carrinho.find(i => i.produtoId === p.id); if (it) it.qtd++; else carrinho.push({ produtoId: p.id, qtd: 1, preco: +p.preco || 0 });
+      e.target.value = ''; desenharCarrinho();
+    });
+    $('#vpItens').addEventListener('click', e => {
+      const b = e.target.closest('[data-q]'); if (!b) return; e.preventDefault();
+      const it = carrinho[+b.dataset.i]; if (!it) return;
+      if (b.dataset.q === 'rm') carrinho.splice(+b.dataset.i, 1); else it.qtd = Math.max(1, it.qtd + (+b.dataset.q));
+      desenharCarrinho();
+    });
+    $('#vpItens').addEventListener('input', e => { if (e.target.dataset.preco != null) { carrinho[+e.target.dataset.preco].preco = num(e.target.value) ?? 0; totalVenda(); } });
+    $('#vpDesc').addEventListener('input', totalVenda);
+  });
+}
+function desenharCarrinho() {
+  const el = $('#vpItens'); if (!el) return;
+  el.innerHTML = carrinho.length ? carrinho.map((it, i) => { const p = prodById(it.produtoId) || {}; const falta = it.qtd > (+p.estoque || 0); return `<div class="cart">
+    <div class="cart-n"><b>${esc(p.nome || 'Produto')}</b><small class="${falta ? 'txt-bad' : 'muted'}">${+p.estoque || 0} em estoque${falta ? ' · insuficiente' : ''}</small></div>
+    <div class="cart-q"><button data-q="-1" data-i="${i}">−</button><span>${it.qtd}</span><button data-q="1" data-i="${i}">+</button></div>
+    <input class="cart-p" inputmode="decimal" data-preco="${i}" value="${(+it.preco || 0).toFixed(2).replace('.', ',')}" aria-label="Preço unitário">
+    <button class="cart-x" data-q="rm" data-i="${i}" aria-label="Remover">${ICON.x}</button></div>`; }).join('') : '<p class="muted small" style="margin:-4px 2px 12px">Nenhum produto adicionado.</p>';
+  totalVenda();
+}
+function totalVenda() {
+  const sub = carrinho.reduce((s, i) => s + i.qtd * (+i.preco || 0), 0), desc = Math.min(sub, num($('#vpDesc')?.value) || 0);
+  const el = $('#vpTotal'); if (el) el.textContent = brl(sub - desc);
+}
+async function salvarVendaProd(form) {
+  if (!carrinho.length) return toast('Adicione ao menos um produto');
+  const falta = carrinho.filter(i => i.qtd > (+prodById(i.produtoId)?.estoque || 0));
+  if (falta.length && !confirm(`Estoque insuficiente de ${falta.map(i => prodById(i.produtoId)?.nome).join(', ')}. Registrar a venda mesmo assim?`)) return;
+  const sub = carrinho.reduce((s, i) => s + i.qtd * (+i.preco || 0), 0), desc = r2(Math.min(sub, num($('#vpDesc').value) || 0));
+  const cliNome = $('#vpCli').value.trim(), cli = S.clientes.find(c => norm(c.nome) === norm(cliNome));
+  const vend = profById($('#vpVend').value), forma = document.querySelector('[name=vpForma]:checked')?.value || 'Pix';
+  form.querySelector('button.pri').disabled = true;
+  try {
+    await F.runTransaction(db, async tx => {
+      const ids = [...new Set(carrinho.map(i => i.produtoId))], snaps = {};
+      for (const id of ids) snaps[id] = (await tx.get(dref('produtos', id))).data();
+      const itens = carrinho.map(i => ({ produtoId: i.produtoId, nome: snaps[i.produtoId]?.nome || '', qtd: i.qtd, preco: r2(+i.preco || 0), custo: r2(+snaps[i.produtoId]?.custo || 0) }));
+      const vref = F.doc(col('vendas')), h = agoraHM();
+      for (const id of ids) {
+        const q = itens.filter(i => i.produtoId === id).reduce((s, i) => s + i.qtd, 0);
+        tx.update(dref('produtos', id), { estoque: (+snaps[id]?.estoque || 0) - q });
+        tx.set(F.doc(col('movimentos')), { tipo: 'venda', vendaId: vref.id, produtoId: id, produtoNome: snaps[id]?.nome || '', qtd: -q, custoUnit: +snaps[id]?.custo || 0, data: hoje(), hora: h, obs: cliNome });
+      }
+      tx.set(vref, { data: hoje(), hora: h, itens, subtotal: r2(sub), desconto: desc, total: r2(sub - desc), custoTotal: r2(itens.reduce((s, i) => s + i.qtd * i.custo, 0)), formaPg: forma, clienteId: cli?.id || '', clienteNome: cliNome, vendedorId: vend?.id || '', vendedorNome: vend?.nome || '', criadoEm: F.serverTimestamp() });
+    });
+    carrinho = []; closeSheet(); toast('Venda registrada');
+  } catch (e) { console.error(e); toast('Não foi possível registrar a venda'); form.querySelector('button.pri').disabled = false; }
+}
+function sheetVenda(id) {
+  const v = S.vendas.find(x => x.id === id); if (!v) return closeSheet();
+  const lucro = (+v.total || 0) - (+v.custoTotal || 0);
+  openSheet(head('Venda de produtos', `${fmtBR(v.data)} ${v.hora || ''}`) + `
+    <div class="card" style="margin-bottom:12px">${v.itens.map(i => `<div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0"><span>${i.qtd}× ${esc(i.nome)}</span><b>${brl(i.qtd * i.preco)}</b></div>`).join('')}
+      ${v.desconto ? `<div style="display:flex;justify-content:space-between;padding:3px 0" class="muted"><span>Desconto</span><span>− ${brl(v.desconto)}</span></div>` : ''}
+      <div style="display:flex;justify-content:space-between;padding-top:8px;margin-top:6px;border-top:1px solid var(--line)"><b>Total</b><b>${brl(v.total)}</b></div></div>
+    <dl class="kv"><dt>Pagamento</dt><dd>${esc(v.formaPg)}</dd>${v.clienteNome ? `<dt>Cliente</dt><dd>${esc(v.clienteNome)}</dd>` : ''}${v.vendedorNome ? `<dt>Vendido por</dt><dd>${esc(v.vendedorNome)}</dd>` : ''}<dt>Custo dos produtos</dt><dd>${brl(v.custoTotal)}</dd><dt>Lucro</dt><dd>${brl(lucro)}</dd></dl>
+    <button class="btn ghost danger full" data-act="cancelarVenda" data-id="${id}">${ICON.trash}Cancelar venda e devolver ao estoque</button>`);
+}
+async function cancelarVenda(id) {
+  const v = S.vendas.find(x => x.id === id); if (!v || !confirm('Cancelar esta venda? Os produtos voltam para o estoque.')) return;
+  await F.runTransaction(db, async tx => {
+    const ids = [...new Set(v.itens.map(i => i.produtoId))], snaps = {};
+    for (const pid of ids) { const s = await tx.get(dref('produtos', pid)); snaps[pid] = s.exists() ? s.data() : null; }
+    for (const pid of ids) {
+      if (!snaps[pid]) continue;
+      const q = v.itens.filter(i => i.produtoId === pid).reduce((s, i) => s + i.qtd, 0);
+      tx.update(dref('produtos', pid), { estoque: (+snaps[pid].estoque || 0) + q });
+      tx.set(F.doc(col('movimentos')), { tipo: 'estorno', vendaId: id, produtoId: pid, produtoNome: snaps[pid].nome, qtd: q, custoUnit: +snaps[pid].custo || 0, data: hoje(), hora: agoraHM(), obs: 'Venda de ' + fmtBR(v.data) + ' cancelada' });
+    }
+    tx.delete(dref('vendas', id));
+  });
+  closeSheet(); toast('Venda cancelada');
+}
+
 /* ---------- AJUSTES ---------- */
 const linkCliente = () => new URL('../?s=' + encodeURIComponent(SID), location.href.split('?')[0]).href;
 function vAjustes() {
@@ -1034,6 +1337,9 @@ function vAjustes() {
     </div>
     <label class="fld" style="margin:0"><span>Agendar até quantos dias à frente</span><input id="cfDias" type="number" min="1" max="180" value="${+c.diasFrente || 30}"></label>
   </div>
+  <div class="sec-t"><h3>Produtos</h3></div>
+  <div class="card"><label class="fld" style="margin:0"><span>Comissão sobre venda de produtos (%)</span><input id="cfComProd" type="number" min="0" max="100" step="0.5" value="${+c.comissaoProduto || 0}"></label>
+    <p class="muted small" style="margin:6px 2px 0">Vale para a profissional marcada em “Vendido por”.</p></div>
   <div class="sec-t"><h3>Mensagens do WhatsApp</h3></div>
   <div class="card">
     <p class="muted small" style="margin:0 0 10px">Use {cliente}, {servico}, {profissional}, {data}, {hora}, {salao} e {endereco}.</p>
@@ -1049,7 +1355,7 @@ function vAjustes() {
 }
 async function salvarCfg() {
   const ap = lerAparencia();
-  const d = { cor: ap.cor, tema: ap.tema, logoFundo: ap.logoFundo, slogan: ap.slogan, ...('logo' in rascunho ? { logo: rascunho.logo } : {}), nome: $('#cfNome').value.trim() || 'Meu Salão', whatsapp: $('#cfWa').value.trim(), endereco: $('#cfEnd').value.trim(), instagram: $('#cfIg').value.trim(), online: $('#cfOn').checked, intervalo: +$('#cfInt').value, antecedencia: +$('#cfAnt').value, diasFrente: Math.max(1, +$('#cfDias').value || 30), msgConfirmacao: $('#cfMC').value, msgLembrete: $('#cfML').value, msgAniversario: $('#cfMA').value };
+  const d = { cor: ap.cor, tema: ap.tema, logoFundo: ap.logoFundo, slogan: ap.slogan, ...('logo' in rascunho ? { logo: rascunho.logo } : {}), nome: $('#cfNome').value.trim() || 'Meu Salão', whatsapp: $('#cfWa').value.trim(), endereco: $('#cfEnd').value.trim(), instagram: $('#cfIg').value.trim(), online: $('#cfOn').checked, intervalo: +$('#cfInt').value, antecedencia: +$('#cfAnt').value, diasFrente: Math.max(1, +$('#cfDias').value || 30), msgConfirmacao: $('#cfMC').value, msgLembrete: $('#cfML').value, msgAniversario: $('#cfMA').value, comissaoProduto: Math.min(100, Math.max(0, +$('#cfComProd').value || 0)) };
   await F.setDoc(dref('config', 'salao'), d, { merge: true });
   S.cfgSujo = false; rascunho = {}; Object.assign(S.cfg, d); aplicarTema(S.cfg); render();
   toast('Ajustes salvos');
@@ -1173,7 +1479,7 @@ const ACT = {
   reabrir: async d => {
     if (!confirm('Reabrir o atendimento? O pagamento registrado será desfeito.')) return;
     const a = agById(d.id); await devolverSessao(a);
-    await F.updateDoc(dref('agendamentos', d.id), { status: 'confirmado', valorCobrado: F.deleteField(), formaPg: F.deleteField(), baseComissao: F.deleteField(), pacoteClienteId: '' });
+    await F.updateDoc(dref('agendamentos', d.id), { status: 'confirmado', valorCobrado: F.deleteField(), formaPg: F.deleteField(), baseComissao: F.deleteField(), pagoEm: F.deleteField(), pacoteClienteId: '' });
     Object.assign(a, { status: 'confirmado', pacoteClienteId: '' }); delete a.valorCobrado; delete a.formaPg;
     toast('Atendimento reaberto'); sheetAg(d.id);
   },
@@ -1189,6 +1495,13 @@ const ACT = {
   editarCli: d => formCli(d.id),
   agendarCli: d => { const c = cliById(d.id); formAg(null, { clienteId: c.id, clienteNome: c.nome, telefone: c.telefone || '' }); },
   venderPac: d => formVenderPac(d.id),
+  prodFiltro: d => { S.prodFiltro = d.f; render(); },
+  verProd: d => sheetProd(d.id), novoProd: () => formProd(null), editProd: d => formProd(d.id),
+  excluirProd: async d => { if (!confirm('Excluir este produto? As vendas já registradas continuam no caixa. Para só tirar de venda, desmarque “À venda”.')) return; await F.deleteDoc(dref('produtos', d.id)); closeSheet(); toast('Produto excluído'); },
+  entrada: d => formEntrada(d.prod || ''), ajuste: d => formAjuste(d.id),
+  novaVenda: d => formVendaProd({ prod: d.prod || '' }),
+  vendaCli: d => { const a = agById(d.id); formVendaProd({ clienteNome: a?.clienteNome || '' }); },
+  verVenda: d => sheetVenda(d.id), cancelarVenda: d => cancelarVenda(d.id),
   venderPacAg: async d => {
     const a = agById(d.id); if (!a) return;
     let cid = a.clienteId;
@@ -1226,7 +1539,7 @@ document.addEventListener('click', e => {
   e.preventDefault();
   Promise.resolve(f(b.dataset, b, e)).catch(err => { console.error(err); toast('Algo deu errado: ' + (err.code || err.message || '')); });
 });
-const FORMS = { fLogin: entrar, fAg: salvarAg, fBloq: salvarBloqueio, fReceber: salvarReceber, fCli: salvarCli, fVenda: salvarVenda, fServ: salvarServ, fPac: salvarPac, fProf: salvarProf, fCfg: salvarCfg };
+const FORMS = { fProd: salvarProd, fEntrada: salvarEntrada, fAjuste: salvarAjuste, fVendaProd: salvarVendaProd, fLogin: entrar, fAg: salvarAg, fBloq: salvarBloqueio, fReceber: salvarReceber, fCli: salvarCli, fVenda: salvarVenda, fServ: salvarServ, fPac: salvarPac, fProf: salvarProf, fCfg: salvarCfg };
 document.addEventListener('submit', e => {
   const f = FORMS[e.target.id]; if (!f) return;
   e.preventDefault();
@@ -1236,6 +1549,7 @@ document.addEventListener('input', e => {
   if (e.target.id === 'cfCorCustom') { document.querySelectorAll('[name=cfCor]').forEach(r => r.checked = false); e.target.closest('.custom').classList.add('on'); S.cfgSujo = true; previewTema(); return; }
   if (e.target.closest && e.target.closest('#fCfg')) { S.cfgSujo = true; if (e.target.id === 'cfSlogan' || e.target.id === 'cfNome') previewTema(); }
   if (e.target.dataset.in === 'cliBusca') { S.cliBusca = e.target.value; render(); }
+  if (e.target.dataset.in === 'prodBusca') { S.prodBusca = e.target.value; render(); }
 });
 document.addEventListener('change', e => {
   if (e.target.id === 'cfLogo' && e.target.files[0]) { prepararLogo(e.target.files[0]).then(u => { rascunho.logo = u; S.cfgSujo = true; previewTema(); }).catch(() => toast('Não foi possível abrir essa imagem')); return; }
@@ -1264,6 +1578,8 @@ function ouvir() {
   L(dref('privado', 'comissoes'), s => S.comissoes = s.exists() ? s.data() : {});
   L(col('clientes'), s => S.clientes = mapa(s).sort(porNome));
   L(col('clientePacotes'), s => S.cpacotes = mapa(s));
+  L(col('produtos'), s => S.produtos = mapa(s).sort(porNome));
+  L(F.query(col('vendas'), F.where('data', '>=', addDias(hoje(), -30))), s => S.vendas = mapa(s));
   ouvirAgs();
 }
 function ouvirAgs() {
@@ -1296,7 +1612,7 @@ async function carregarAparenciaLogin() {
 }
 async function entrouSaiu(u) {
   pararOuvir(); if (unsubSalao) unsubSalao(); unsubSalao = null;
-  Object.assign(S, { user: u, acesso: null, suporte: false, salao: null, ags: [], servicos: [], profs: [], pacotes: [], clientes: [], cpacotes: [], comissoes: {}, relDados: null, cfg: { ...CFG_PADRAO } });
+  Object.assign(S, { user: u, acesso: null, suporte: false, salao: null, ags: [], servicos: [], profs: [], pacotes: [], clientes: [], cpacotes: [], produtos: [], vendas: [], comissoes: {}, relDados: null, cfg: { ...CFG_PADRAO } });
   SID = null; rascunho = {}; S.cfgSujo = false;
   if (!u) { loginCfg = lerAparenciaLocal() || loginCfg; aplicarLogin(); S.pronto = true; render(); return; }
   S.pronto = true; render();

@@ -9,20 +9,20 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--hero:#7a2e63;--on-hero:#fff;--bg:#f8f4f2;--surface:#fff;--surface2:#f3ecee;--ink:#2a1f27;--muted:#7b6b75;--line:#e9dfe3;--brand:#7a2e63;--brand-soft:#f4e6ef;--on-brand:#fff;--ok:#2f855a;--shadow:0 1px 2px rgba(42,31,39,.06),0 6px 20px rgba(42,31,39,.06);--r:16px;color-scheme:light}
+:root{--fh:'Fraunces',Georgia,serif;--fb:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;--hw:600;--rk:1;--pill:999px;--tt:none;--ls:-.01em;--hero:#7a2e63;--on-hero:#fff;--bg:#f8f4f2;--surface:#fff;--surface2:#f3ecee;--ink:#2a1f27;--muted:#7b6b75;--line:#e9dfe3;--brand:#7a2e63;--brand-soft:#f4e6ef;--on-brand:#fff;--ok:#2f855a;--shadow:0 1px 2px rgba(42,31,39,.06),0 6px 20px rgba(42,31,39,.06);--r:calc(var(--rk) * 16px);color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#141016;--surface:#1f1922;--surface2:#2a222e;--ink:#f4edf2;--muted:#a8989f;--line:#352c39;--brand:#d68cc0;--brand-soft:#3a2536;--on-brand:#1c1119;--ok:#5fc08a;--shadow:none;color-scheme:dark}}
 :root[data-theme=dark]{--bg:#141016;--surface:#1f1922;--surface2:#2a222e;--ink:#f4edf2;--muted:#a8989f;--line:#352c39;--brand:#d68cc0;--brand-soft:#3a2536;--on-brand:#1c1119;--ok:#5fc08a;--shadow:none;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--fb)}
 button,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
-h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;margin:0;letter-spacing:-.01em}
+h1,h2,h3{font-family:var(--fh);font-weight:var(--hw);margin:0;letter-spacing:var(--ls);text-transform:var(--tt)}
 svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .muted{color:var(--muted)}.small{font-size:13px}
 .hero{background:var(--hero);color:var(--on-hero);padding:calc(28px + env(safe-area-inset-top)) 20px 44px;text-align:center;position:relative;overflow:hidden}
 .hero::after{content:"";position:absolute;inset:auto -20% -60px;height:90px;background:var(--bg);border-radius:50% 50% 0 0}
-.hero .logo{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.16);display:grid;place-items:center;margin:0 auto 12px;overflow:hidden}
-.hero .logo.img{width:96px;height:96px;border-radius:24px;background:#fff;padding:6px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.hero .logo{width:56px;height:56px;border-radius:calc(var(--rk) * 16px);background:rgba(255,255,255,.16);display:grid;place-items:center;margin:0 auto 12px;overflow:hidden}
+.hero .logo.img{width:96px;height:96px;border-radius:calc(var(--rk) * 24px);background:#fff;padding:6px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
 .hero .logo.img.semfundo{background:transparent;padding:0;box-shadow:none}
 .hero .logo img{width:100%;height:100%;object-fit:contain;display:block}
 .hero .slogan{margin:4px 0 0;font-size:15px;opacity:.95}
@@ -30,15 +30,15 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .hero h1{font-size:28px;line-height:1.15}
 .hero p{margin:6px 0 0;opacity:.85;font-size:14px}
 .hero .acts{display:flex;justify-content:center;gap:8px;margin-top:14px;position:relative;z-index:1;flex-wrap:wrap}
-.hero .acts a{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);color:inherit;text-decoration:none;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600}
+.hero .acts a{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);color:inherit;text-decoration:none;border-radius:var(--pill);padding:7px 13px;font-size:13px;font-weight:600}
 .wrap{max-width:620px;margin:-18px auto 0;padding:0 16px calc(120px + env(safe-area-inset-bottom));position:relative;z-index:1}
 .step{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);scroll-margin-top:12px}
 .step h2{font-size:19px;display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.step h2 i{font-style:normal;font-family:Inter,sans-serif;font-size:12px;font-weight:700;width:24px;height:24px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center}
+.step h2 i{font-style:normal;font-family:var(--fb);font-size:12px;font-weight:700;width:24px;height:24px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center}
 .step.feito h2 i{background:var(--brand);color:var(--on-brand)}
 .cat{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:14px 2px 6px}
 .cat:first-child{margin-top:0}
-.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:calc(var(--rk) * 14px);padding:12px 14px;margin-bottom:8px}
 .opt .g{flex:1;min-width:0}
 .opt .g b{display:block}
 .opt .g small{display:block;color:var(--muted);font-size:13px}
@@ -49,7 +49,7 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none;font-size:14px}
 .dias{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none;scroll-snap-type:x proximity}
 .dias::-webkit-scrollbar{display:none}
-.dia{flex:none;width:58px;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:1px;scroll-snap-align:start}
+.dia{flex:none;width:58px;border:1px solid var(--line);background:var(--surface);border-radius:calc(var(--rk) * 14px);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:1px;scroll-snap-align:start}
 .dia small{font-size:11px;color:var(--muted);text-transform:uppercase}
 .dia b{font-size:19px}
 .dia em{font-style:normal;font-size:10px;color:var(--muted);text-transform:uppercase}
@@ -58,13 +58,13 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .dia.on small,.dia.on em{color:var(--on-brand)}
 .turno{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:12px 2px 6px}
 .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px}
-.slot{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 0;font-weight:600}
+.slot{border:1px solid var(--line);background:var(--surface);border-radius:calc(var(--rk) * 12px);padding:10px 0;font-weight:600}
 .slot.on{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
 .fld{display:block;margin-bottom:12px}
 .fld>span{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 5px 2px;text-transform:uppercase;letter-spacing:.03em}
-.fld input,.fld textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;outline:0;min-height:46px}
+.fld input,.fld textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:calc(var(--rk) * 12px);padding:12px;outline:0;min-height:46px}
 .fld input:focus,.fld textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:13px 16px;font-weight:600;text-decoration:none;color:var(--ink);min-height:48px;width:100%}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:calc(var(--rk) * 14px);padding:13px 16px;font-weight:600;text-decoration:none;color:var(--ink);min-height:48px;width:100%}
 .btn.pri{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
 .btn.wa{background:#1f9d55;border-color:#1f9d55;color:#fff}
 .btn:disabled{opacity:.5}
@@ -74,27 +74,42 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .bar .res{flex:1;min-width:0;font-size:13px}
 .bar .res b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bar .btn{width:auto;flex:none}
-.pac{border:1px dashed var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.pac{border:1px dashed var(--line);border-radius:calc(var(--rk) * 14px);padding:12px 14px;margin-bottom:8px}
 .pac .top{display:flex;justify-content:space-between;gap:10px}
 .pac a,.pac button.lk{display:inline-block;margin-top:6px;color:var(--brand);font-weight:600;text-decoration:none;font-size:14px;background:none;border:0;padding:0}
-.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface2);border-radius:12px;padding:3px;margin:-2px 0 12px}
-.tabs button{border:0;background:none;border-radius:10px;padding:9px 4px;font-weight:600;font-size:14px;color:var(--muted)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface2);border-radius:calc(var(--rk) * 12px);padding:3px;margin:-2px 0 12px}
+.tabs button{border:0;background:none;border-radius:calc(var(--rk) * 10px);padding:9px 4px;font-weight:600;font-size:14px;color:var(--muted)}
 .tabs button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 .opt .eco{display:inline-block;margin-top:4px;font-size:12px;font-weight:600;color:var(--ok)}
-.aviso-pac{background:var(--brand-soft);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
+.aviso-pac{background:var(--brand-soft);border-radius:calc(var(--rk) * 12px);padding:10px 12px;font-size:13px;margin-top:10px}
 .aviso{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;text-align:center;margin-bottom:12px}
 .done{text-align:center;padding:10px 4px}
 .done .ok{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok);display:grid;place-items:center;margin:4px auto 12px}
 .done .ok svg{width:34px;height:34px;stroke-width:2.4}
 .done h2{font-size:24px}
-.resumo{background:var(--surface2);border-radius:14px;padding:12px 14px;text-align:left;margin:14px 0}
+.resumo{background:var(--surface2);border-radius:calc(var(--rk) * 14px);padding:12px 14px;text-align:left;margin:14px 0}
 .resumo div{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
 .resumo div span:first-child{color:var(--muted)}
 .resumo div span:last-child{font-weight:600;text-align:right}
 .spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--brand);border-radius:50%;animation:rot .8s linear infinite;margin:30px auto}
 @keyframes rot{to{transform:rotate(360deg)}}
-.ult{display:flex;align-items:center;gap:10px;background:var(--brand-soft);border-radius:14px;padding:10px 14px;margin-bottom:12px;font-size:14px}
+.ult{display:flex;align-items:center;gap:10px;background:var(--brand-soft);border-radius:calc(var(--rk) * 14px);padding:10px 14px;margin-bottom:12px;font-size:14px}
 [hidden]{display:none!important}
+/* decoração por estilo */
+.hero>*{position:relative;z-index:1}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0}
+:root[data-estilo=delicado] .hero::before{background:radial-gradient(circle at 12% 22%,rgba(255,255,255,.18) 0 38px,transparent 39px),radial-gradient(circle at 90% 30%,rgba(255,255,255,.13) 0 62px,transparent 63px),radial-gradient(circle at 72% 88%,rgba(255,255,255,.1) 0 26px,transparent 27px),radial-gradient(circle at 25% 80%,rgba(255,255,255,.08) 0 14px,transparent 15px)}
+:root[data-estilo=glamour] .hero::before{inset:auto 18% 40px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent)}
+:root[data-estilo=natural] .hero::before{background:radial-gradient(ellipse at 0 100%,rgba(255,255,255,.14) 0 34%,transparent 35%),radial-gradient(ellipse at 100% 0,rgba(0,0,0,.1) 0 28%,transparent 29%)}
+:root[data-estilo=rustico] .hero::before{background:repeating-linear-gradient(178deg,rgba(0,0,0,.09) 0 2px,transparent 2px 9px,rgba(255,255,255,.04) 9px 10px,transparent 10px 17px)}
+:root[data-estilo=moderno] .hero::before{inset:auto 0 0 0;height:4px;background:var(--on-hero);opacity:.3}
+:root[data-estilo=vintage] .hero::before{inset:auto 0 0 0;height:12px;background:repeating-linear-gradient(135deg,#c0392b 0 12px,#fff 12px 24px,#1f3a5f 24px 36px,#fff 36px 48px)}
+:root[data-estilo=rustico] .hero::after,:root[data-estilo=moderno] .hero::after,:root[data-estilo=vintage] .hero::after{display:none}
+:root[data-estilo=rustico] .hero,:root[data-estilo=moderno] .hero,:root[data-estilo=vintage] .hero{padding-bottom:32px;margin-bottom:18px}
+:root[data-estilo=moderno] .hero h1{font-size:40px;letter-spacing:.06em}
+:root[data-estilo=vintage] .hero h1{font-size:30px}
+:root[data-estilo=delicado] .hero h1{font-size:34px}
+
 </style>
 </head>
 <body>
@@ -435,6 +450,26 @@ async function init() {
     F.onSnapshot(col('pacotes'), s => { S.pacotes = mapa(s); render(); }, () => {});
   } catch (e) { console.error(e); $('#fluxo').innerHTML = '<div class="aviso"><p class="muted" style="margin:0">Sem conexão. Verifique a internet.</p></div>'; }
 }
+/* ---------- estilos por ambiente ---------- */
+const ESTILOS = {
+  padrao:   { nome: 'Clássico', amb: 'unissex', desc: 'Elegante e neutro', cor: '#7a2e63', fh: "'Fraunces',Georgia,serif", fb: "'Inter',system-ui,sans-serif", hw: 600, rk: 1, pill: '999px', tt: 'none', ls: '-.01em', fontes: ['Fraunces:opsz,wght@9..144,600', 'Inter:wght@400;500;600;700'] },
+  delicado: { nome: 'Delicado', amb: 'feminino', desc: 'Traços finos e cantos bem arredondados', cor: '#c2577a', fh: "'Cormorant Garamond',Georgia,serif", fb: "'Nunito',system-ui,sans-serif", hw: 700, rk: 1.5, pill: '999px', tt: 'none', ls: '0', fontes: ['Cormorant+Garamond:wght@600;700', 'Nunito:wght@400;600;700'] },
+  glamour:  { nome: 'Glamour', amb: 'feminino', desc: 'Sofisticado, com toque dourado', cor: '#b08a3e', fh: "'Playfair Display',Georgia,serif", fb: "'Jost',system-ui,sans-serif", hw: 600, rk: 1, pill: '999px', tt: 'none', ls: '0', fontes: ['Playfair+Display:wght@600;700', 'Jost:wght@400;500;600'] },
+  natural:  { nome: 'Natural', amb: 'feminino', desc: 'Tons de terra, acolhedor', cor: '#9a6b4f', fh: "'Lora',Georgia,serif", fb: "'Nunito',system-ui,sans-serif", hw: 600, rk: 1.7, pill: '999px', tt: 'none', ls: '0', fontes: ['Lora:wght@600', 'Nunito:wght@400;600;700'] },
+  rustico:  { nome: 'Rústico', amb: 'masculino', desc: 'Madeira, couro e ferro', cor: '#7a4a2a', fh: "'Alfa Slab One',Georgia,serif", fb: "'Source Sans 3',system-ui,sans-serif", hw: 400, rk: .45, pill: '6px', tt: 'none', ls: '.01em', fontes: ['Alfa+Slab+One', 'Source+Sans+3:wght@400;600;700'] },
+  moderno:  { nome: 'Moderno', amb: 'masculino', desc: 'Minimalista, linhas retas', cor: '#2b2b30', fh: "'Bebas Neue',Impact,sans-serif", fb: "'Inter',system-ui,sans-serif", hw: 400, rk: .35, pill: '4px', tt: 'uppercase', ls: '.05em', fontes: ['Bebas+Neue', 'Inter:wght@400;500;600;700'] },
+  vintage:  { nome: 'Barbearia clássica', amb: 'masculino', desc: 'Tradicional, faixa de barber pole', cor: '#1f3a5f', fh: "'Oswald',Impact,sans-serif", fb: "'Source Sans 3',system-ui,sans-serif", hw: 600, rk: .6, pill: '6px', tt: 'uppercase', ls: '.03em', fontes: ['Oswald:wght@500;600', 'Source+Sans+3:wght@400;600;700'] },
+};
+const AMBIENTES = [['feminino', 'Feminino'], ['masculino', 'Masculino'], ['unissex', 'Unissex']];
+const fontesCarregadas = new Set(['Fraunces:opsz,wght@9..144,600', 'Inter:wght@400;500;600;700']);
+function carregarFontes(lista) {
+  const novas = lista.filter(f => !fontesCarregadas.has(f)); if (!novas.length) return;
+  novas.forEach(f => fontesCarregadas.add(f));
+  const l = document.createElement('link'); l.rel = 'stylesheet';
+  l.href = 'https://fonts.googleapis.com/css2?' + novas.map(f => 'family=' + f).join('&') + '&display=swap';
+  document.head.appendChild(l);
+}
+const estiloDe = cfg => ESTILOS[cfg && cfg.estilo] || ESTILOS.padrao;
 /* ---------- tema do salão (cor, logo, claro/escuro) ---------- */
 const PALETAS = [['Ameixa', '#7a2e63'], ['Rosé', '#c2577a'], ['Nude', '#b07a5e'], ['Terracota', '#b5523b'], ['Dourado', '#b08a3e'], ['Esmeralda', '#1f7a5c'], ['Petróleo', '#1f5f73'], ['Azul', '#2f5fb0'], ['Lilás', '#7b5cc4'], ['Grafite', '#3a3a40']];
 const hexRgb = h => { h = String(h || '#7a2e63').replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h, 16) || 0; return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
@@ -446,7 +481,7 @@ function paleta(hex) {
   const base = hexRgb(hex), W = [255, 255, 255], K = [0, 0, 0], BGL = [248, 244, 242], BGD = [31, 25, 34], ESC = [28, 17, 25];
   let l = base; for (let i = 0; i < 12 && contr(l, BGL) < 3.2; i++) l = mixC(l, K, .12);
   let d = base; for (let i = 0; i < 14 && contr(d, BGD) < 4.5; i++) d = mixC(d, W, .12);
-  const on = c => contr(c, W) >= contr(c, ESC) ? '#ffffff' : '#1c1119';
+  const on = c => contr(c, W) >= 2.9 ? '#ffffff' : '#1c1119';
   return { hero: rgbHex(base), heroOn: on(base), l: rgbHex(l), l2: rgbHex(mixC(l, W, .15)), lSoft: rgbHex(mixC(l, W, .88)), lOn: on(l), d: rgbHex(d), d2: rgbHex(mixC(d, W, .15)), dSoft: rgbHex(mixC(d, BGD, .78)), dOn: on(d) };
 }
 function aplicarTema(cfg = {}) {
@@ -456,7 +491,10 @@ function aplicarTema(cfg = {}) {
   const D = `--brand:${p.d};--brand2:${p.d2};--brand-soft:${p.dSoft};--on-brand:${p.dOn};${H}`;
   let st = document.getElementById('temaSalao');
   if (!st) { st = document.createElement('style'); st.id = 'temaSalao'; document.head.appendChild(st); }
-  st.textContent = `:root{${L}}@media (prefers-color-scheme:dark){:root:not([data-theme=light]){${D}}}:root[data-theme=dark]{${D}}`;
+  const e = estiloDe(cfg); carregarFontes(e.fontes);
+  const E = `--fh:${e.fh};--fb:${e.fb};--hw:${e.hw};--rk:${e.rk};--pill:${e.pill};--tt:${e.tt};--ls:${e.ls}`;
+  st.textContent = `:root{${L};${E}}@media (prefers-color-scheme:dark){:root:not([data-theme=light]){${D}}}:root[data-theme=dark]{${D}}`;
+  document.documentElement.dataset.estilo = (cfg && ESTILOS[cfg.estilo]) ? cfg.estilo : 'padrao';
   const de = document.documentElement;
   if (cfg.tema === 'clara') de.dataset.theme = 'light'; else if (cfg.tema === 'escura') de.dataset.theme = 'dark'; else delete de.dataset.theme;
   const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = p.hero;

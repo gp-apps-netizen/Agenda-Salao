@@ -46,7 +46,7 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .opt .r b{display:block}
 .opt .r small{color:var(--muted);font-size:12px}
 .opt.on{border-color:var(--brand);background:var(--brand-soft);box-shadow:0 0 0 1px var(--brand) inset}
-.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none;font-size:14px}
+.av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none;font-size:15px;overflow:hidden}.av img{width:100%;height:100%;object-fit:cover;display:block}
 .dias{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none;scroll-snap-type:x proximity}
 .dias::-webkit-scrollbar{display:none}
 .dia{flex:none;width:58px;border:1px solid var(--line);background:var(--surface);border-radius:calc(var(--rk) * 14px);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:1px;scroll-snap-align:start}
@@ -258,7 +258,7 @@ function render() {
     const ps = (S.profs || []).filter(p => p.ativo !== false && profFaz(p, s.id));
     h += `<section class="step ${S.sel.prof ? 'feito' : ''}" id="stProf"><h2><i>2</i>Com quem?</h2>
       ${ps.length > 1 ? `<button class="opt ${S.sel.prof === 'any' ? 'on' : ''}" data-prof="any"><span class="av" style="background:var(--muted)">${IC.users}</span><span class="g"><b>Sem preferência</b><small>Mostra todos os horários livres</small></span></button>` : ''}
-      ${ps.map(p => `<button class="opt ${S.sel.prof === p.id ? 'on' : ''}" data-prof="${p.id}"><span class="av" style="background:${esc(p.cor || '#7a2e63')}">${esc(iniciais(p.nome))}</span><span class="g"><b>${esc(p.nome)}</b>${p.especialidade ? `<small>${esc(p.especialidade)}</small>` : ''}</span></button>`).join('')}</section>`;
+      ${ps.map(p => `<button class="opt ${S.sel.prof === p.id ? 'on' : ''}" data-prof="${p.id}"><span class="av" style="background:${esc(p.cor || '#7a2e63')}">${p.foto ? `<img src="${p.foto}" alt="">` : esc(iniciais(p.nome))}</span><span class="g"><b>${esc(p.nome)}</b>${p.especialidade ? `<small>${esc(p.especialidade)}</small>` : ''}</span></button>`).join('')}</section>`;
   }
   // 3. dia e horário
   if (s && S.sel.prof) {
@@ -348,7 +348,9 @@ function vFeito() {
 function autoData() {
   const sel = S.sel; if (sel.data) return;
   const n = Math.max(1, +S.cfg.diasFrente || 30);
-  for (let i = 0; i < n; i++) { const d = addDias(hoje(), i); if (candidatos().some(p => trabalha(p, d))) { sel.data = d; break; } }
+  const s = servSel(), dur = +(s && s.duracao) || 30;
+  const aindaDa = (p, d) => { if (d !== hoje()) return true; const h = (p.horarios || {})[parseYmd(d).getDay()]; const min = minStartDe(d) || 0; return h && toMin(h.fim) - dur >= min; };
+  for (let i = 0; i < n; i++) { const d = addDias(hoje(), i); if (candidatos().some(p => trabalha(p, d) && aindaDa(p, d))) { sel.data = d; break; } }
   if (sel.data) ouvirOcupados(sel.data);
 }
 function escolherServ(id) {

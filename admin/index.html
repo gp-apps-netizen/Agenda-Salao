@@ -255,7 +255,7 @@ table.t td.n,table.t th.n{text-align:right}
 <script type="module">
 import { firebaseConfig } from '../firebase-config.js';
 
-const VERSAO = '2.1';
+const VERSAO = '2.2';
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const configurado = !!(firebaseConfig && firebaseConfig.apiKey && !/COLE/i.test(firebaseConfig.apiKey));
 
@@ -1910,6 +1910,24 @@ async function pwa(cfg = {}, nome = 'Salão', curto = 'Salão', startUrl = null)
     add('icon', icons[0].src); add('apple-touch-icon', icons[0].src);
   } catch (e) {}
 }
+/* ao reabrir o app (voltou do segundo plano depois de um tempo), mostra a Agenda de hoje */
+let saiuEm = 0;
+const VOLTA_AGENDA_MIN = 10;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { saiuEm = Date.now(); return; }
+  if (!saiuEm || !S.user || S.acesso !== 'ok') return;
+  const longe = Date.now() - saiuEm > VOLTA_AGENDA_MIN * 60000;
+  saiuEm = 0;
+  if (!longe) return;                                   // voltou rápido (ex.: do WhatsApp): continua onde estava
+  if (S.tab === 'ajustes' && S.cfgSujo) return;         // não perde ajustes não salvos
+  const f = document.querySelector('#sheetBody form');
+  if (f && [...f.querySelectorAll('input,textarea')].some(i => i.type !== 'hidden' && i.type !== 'radio' && i.type !== 'checkbox' && i.value && i.defaultValue !== i.value)) return;   // formulário sendo preenchido
+  if (!$('#sheet').hidden) hideSheet();
+  if (S.tab === 'ajustes') { rascunho = {}; S.cfgSujo = false; aplicarTema(S.cfg); }
+  S.tab = 'agenda'; S.dia = hoje(); S.filtroProf = 'todos';
+  if (S.janela && S.dia < S.janela) ouvirAgs();
+  window.scrollTo(0, 0); render();
+});
 init();
 </script>
 </body>
